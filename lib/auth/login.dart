@@ -1,9 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
-import 'botao_aimado.dart';
-import 'input_customizado.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,171 +7,189 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
-  AnimationController? _controller;
-  Animation<double>? _animacaoBlur;
-  Animation<double>? _animacaoFade;
-  Animation<double>? _animacaoSize;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
-    );
-
-    _animacaoBlur = Tween<double>(
-      begin: 50,
-      end: 0,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller!,
-        curve: Curves.ease,
-      ),
-    );
-
-    _animacaoFade = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller!,
-        curve: Curves.easeInOutQuint,
-      ),
-    );
-
-    _animacaoSize = Tween<double>(
-      begin: 0,
-      end: 500,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller!,
-        curve: Curves.decelerate,
-      ),
-    );
-
-    _controller?.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
-
+class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
-    // timeDilation = 8;
-
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
+    return Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(
+                  'assets/backgrounds/login_page_background_image.png'),
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.topCenter)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Column(
           children: [
-            AnimatedBuilder(
-              animation: _animacaoBlur!,
-              builder: (context, widget) {
-                return Container(
-                  height: 400,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage("images/fundo.png"),
-                      fit: BoxFit.fill,
-                    ),
+            Container(
+              padding: EdgeInsets.only(top: isKeyboardOpen ? 40 : 100),
+              alignment: Alignment.topCenter,
+              child: const Text(
+                "Porate Chai",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Spacer(),
+            Visibility(
+              visible: !isKeyboardOpen,
+              child: Container(
+                alignment: Alignment.topCenter,
+                child: const Text(
+                  "Hi There",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: _animacaoBlur!.value,
-                      sigmaY: _animacaoBlur!.value,
-                    ),
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          left: 10,
-                          child: FadeTransition(
-                            opacity: _animacaoFade!,
-                            child: Image.asset("images/detalhe1.png"),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: !isKeyboardOpen,
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 15),
+                alignment: Alignment.topCenter,
+                child: const Text(
+                  "Let's Get Started!",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 27,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: 420,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                gradient: const LinearGradient(
+                  colors: [Colors.white, Color.fromARGB(255, 66, 66, 54)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 50),
+
+                    // Email Field ---------------------------------------------
+                    const TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.email_rounded),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(40),
                           ),
                         ),
-                        Positioned(
-                          left: 50,
-                          child: FadeTransition(
-                            opacity: _animacaoFade!,
-                            child: Image.asset("images/detalhe2.png"),
+                        hintText: "E-mail",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Password Field ------------------------------------------
+                    const TextField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.key),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(40),
                           ),
+                        ),
+                        hintText: "Password",
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Login button---------------------------------------------
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF77258B),
+                        minimumSize: const Size(double.infinity, 63),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Continue',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color: Colors.white,
+                          )
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Or-------------------------------------------------------
+                    const Stack(
+                      children: [
+                        Divider(
+                          color: Colors.white,
+                          indent: 170,
+                          height: 25,
+                        ),
+                        Center(
+                            child: Text(
+                          "Or",
+                          style: TextStyle(color: Colors.white, fontSize: 15),
+                        )),
+                        Divider(
+                          color: Colors.white,
+                          endIndent: 170,
+                          height: 25,
                         ),
                       ],
                     ),
-                  ),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40, right: 40, top: 20),
-              child: Column(
-                children: [
-                  AnimatedBuilder(
-                    animation: _animacaoSize!,
-                    builder: (context, widget) {
-                      return Container(
-                        width: _animacaoSize?.value,
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 80,
-                              spreadRadius: 1,
-                            )
-                          ],
+                    const SizedBox(height: 10),
+
+                    // Signup/ Create An account button ------------------------
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 63),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(40),
                         ),
-                        child: Column(
-                          children: [
-                            const InputCustomizado(
-                              hint: 'e-mail',
-                              obscure: false,
-                              icon: Icon(Icons.person),
-                            ),
-                            Container(
-                              decoration: const BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    spreadRadius: 0.5,
-                                    blurRadius: 0.5,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const InputCustomizado(
-                              hint: 'senha',
-                              obscure: true,
-                              icon: Icon(Icons.lock),
-                            ),
-                          ],
+                      ),
+                      onPressed: () {},
+                      child: const Text(
+                        'Create an Account',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF77258B),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  BotaoAnimado(controller: _controller!),
-                  const SizedBox(height: 10),
-                  FadeTransition(
-                    opacity: _animacaoFade!,
-                    child: const Text(
-                      "Esqueci minha senha",
-                      style: TextStyle(
-                        color: Color.fromRGBO(255, 100, 127, 1),
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            )
           ],
         ),
       ),
