@@ -1,13 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'auth.dart';
 
 class Login extends StatefulWidget {
-  const Login({super.key});
+  const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  String? errorMessage = 'Hi';
+  bool isLogin = true;
+
+  final TextEditingController _controllerEmail = TextEditingController();
+  final TextEditingController _controllerPassword = TextEditingController();
+
+  // Logi-----------------------------------------------------------------------
+  Future<void> signInWithEmailAndPassword() async {
+    try {
+      // Sign in Attampt
+      await Auth().signInWithEmailAndPassword(
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
+  // Sign Up--------------------------------------------------------------------
+  Future<void> createUserWithEmailAndPassword() async {
+    try {
+      // Sign in Attampt
+      await Auth().createUserWithEmailAndPassword(
+        email: _controllerEmail.text,
+        password: _controllerPassword.text,
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        errorMessage = e.message;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
@@ -20,8 +58,11 @@ class _LoginState extends State<Login> {
               alignment: Alignment.topCenter)),
       child: Scaffold(
         backgroundColor: Colors.transparent,
+
+        // Body Starts Here-----------------------------------------------------
         body: Column(
           children: [
+            // Porate Chai Logo-------------------------------------------------
             Container(
               padding: EdgeInsets.only(top: isKeyboardOpen ? 40 : 100),
               alignment: Alignment.topCenter,
@@ -35,6 +76,8 @@ class _LoginState extends State<Login> {
               ),
             ),
             const Spacer(),
+
+            // Get started Text-------------------------------------------------
             Visibility(
               visible: !isKeyboardOpen,
               child: Container(
@@ -64,6 +107,8 @@ class _LoginState extends State<Login> {
                 ),
               ),
             ),
+
+            // White  Gradient rounded  box ------------------------------------
             Container(
               height: 420,
               decoration: BoxDecoration(
@@ -81,10 +126,11 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 50),
 
                     // Email Field ---------------------------------------------
-                    const TextField(
+                    TextField(
+                      controller: _controllerEmail,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.email_rounded),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.alternate_email),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(
@@ -99,9 +145,10 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 20),
 
                     // Password Field ------------------------------------------
-                    const TextField(
+                    TextField(
+                      controller: _controllerPassword,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.key),
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -125,7 +172,9 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        signInWithEmailAndPassword();
+                      },
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -176,7 +225,9 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        createUserWithEmailAndPassword();
+                      },
                       child: const Text(
                         'Create an Account',
                         style: TextStyle(

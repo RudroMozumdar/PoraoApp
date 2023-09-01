@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "126183682637",
+    "project_id": "poraoapp-46e47",
+    "storage_bucket": "poraoapp-46e47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126183682637:android:5b2a03d13bde9821bae204",
+        "android_client_info": {
+          "package_name": "com.example.porao_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126183682637-alkil2hgjljju99jskqripqnv8edmtmg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.porao_app",
+            "certificate_hash": "6e3eb39063d6d6a70c20298e5c43b7050b47dcd4"
+          }
+        },
+        {
+          "client_id": "126183682637-n2hi55t79t2o4m4pbo1v137gntr7233c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyBI13JgSPFmX7m8G5SCo5SZr6qaqSGRU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126183682637-n2hi55t79t2o4m4pbo1v137gntr7233c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

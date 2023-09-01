@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+import 'package:porao_app/common/all_import.dart';
 
-import 'auth/login.dart';
-
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -35,6 +35,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return const Login();
+    return const WidgetTree();
   }
 }
