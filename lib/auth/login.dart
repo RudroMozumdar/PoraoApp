@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:porao_app/common/custom_textfield.dart';
 import 'auth.dart';
 
 class Login extends StatefulWidget {
@@ -12,6 +13,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   String? errorMessage = 'Hi';
   bool isLogin = true;
+  IconData passwordShowHideIcon = Icons.remove_red_eye;
+  bool passwordShowHide = false;
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
@@ -53,7 +56,7 @@ class _LoginState extends State<Login> {
       decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage(
-                  'assets/backgrounds/login_page_background_image.png'),
+                  'assets/images/backgrounds/login_page_background_image.png'),
               fit: BoxFit.fitWidth,
               alignment: Alignment.topCenter)),
       child: Scaffold(
@@ -126,46 +129,41 @@ class _LoginState extends State<Login> {
                     const SizedBox(height: 50),
 
                     // Email Field ---------------------------------------------
-                    TextField(
+                    CustomTextField(
+                      hintText: "E-mail",
+                      prefixIcon: const Icon(Icons.alternate_email),
+                      borderRadius: 40,
                       controller: _controllerEmail,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.alternate_email),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(40),
-                          ),
-                        ),
-                        hintText: "E-mail",
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
+                      textInpputType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: 20),
 
                     // Password Field ------------------------------------------
-                    TextField(
-                      controller: _controllerPassword,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.key),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(40),
-                          ),
-                        ),
-                        hintText: "Password",
-                        filled: true,
-                        fillColor: Colors.white,
+                    CustomTextField(
+                      hintText: "Password",
+                      prefixIcon: const Icon(Icons.key),
+                      sufffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            passwordShowHide = !passwordShowHide;
+                          });
+                        },
+                        icon: Icon(passwordShowHide
+                            ? Icons.visibility
+                            : Icons.visibility_off),
                       ),
+                      borderRadius: 40,
+                      controller: _controllerPassword,
+                      textInpputType: TextInputType.visiblePassword,
+                      showHideText: !passwordShowHide,
                     ),
                     const SizedBox(height: 20),
 
                     // Login button---------------------------------------------
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        elevation: 5,
+                        shadowColor: const Color.fromARGB(255, 78, 78, 78),
                         backgroundColor: const Color(0xFF77258B),
                         minimumSize: const Size(double.infinity, 63),
                         shape: RoundedRectangleBorder(
@@ -220,6 +218,8 @@ class _LoginState extends State<Login> {
                     // Signup/ Create An account button ------------------------
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
+                        elevation: 5,
+                        shadowColor: const Color.fromARGB(255, 61, 61, 61),
                         minimumSize: const Size(double.infinity, 63),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40),
