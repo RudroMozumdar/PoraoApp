@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:porao_app/common/custom_textfield.dart';
-import 'auth.dart';
+import '../common/all_import.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -11,34 +8,17 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  String? errorMessage = 'Hi';
-  bool isLogin = true;
-  IconData passwordShowHideIcon = Icons.remove_red_eye;
+  String? errorMessage = '';
   bool passwordShowHide = false;
 
   final TextEditingController _controllerEmail = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
 
-  // Logi-----------------------------------------------------------------------
+  // Login-----------------------------------------------------------------------
   Future<void> signInWithEmailAndPassword() async {
     try {
       // Sign in Attampt
       await Auth().signInWithEmailAndPassword(
-        email: _controllerEmail.text,
-        password: _controllerPassword.text,
-      );
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        errorMessage = e.message;
-      });
-    }
-  }
-
-  // Sign Up--------------------------------------------------------------------
-  Future<void> createUserWithEmailAndPassword() async {
-    try {
-      // Sign in Attampt
-      await Auth().createUserWithEmailAndPassword(
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
@@ -69,12 +49,13 @@ class _LoginState extends State<Login> {
             Container(
               padding: EdgeInsets.only(top: isKeyboardOpen ? 40 : 100),
               alignment: Alignment.topCenter,
-              child: const Text(
+              child: Text(
                 "Porate Chai",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  fontFamily: primaryFont,
                 ),
               ),
             ),
@@ -85,12 +66,13 @@ class _LoginState extends State<Login> {
               visible: !isKeyboardOpen,
               child: Container(
                 alignment: Alignment.topCenter,
-                child: const Text(
-                  "Hi There",
+                child: Text(
+                  "Hi There!!",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    fontFamily: primaryFont,
                   ),
                 ),
               ),
@@ -100,12 +82,13 @@ class _LoginState extends State<Login> {
               child: Container(
                 padding: const EdgeInsets.only(bottom: 15),
                 alignment: Alignment.topCenter,
-                child: const Text(
+                child: Text(
                   "Let's Get Started!",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 27,
                     fontWeight: FontWeight.bold,
+                    fontFamily: primaryFont,
                   ),
                 ),
               ),
@@ -149,8 +132,8 @@ class _LoginState extends State<Login> {
                           });
                         },
                         icon: Icon(passwordShowHide
-                            ? Icons.visibility
-                            : Icons.visibility_off),
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined),
                       ),
                       borderRadius: 40,
                       controller: _controllerPassword,
@@ -173,7 +156,7 @@ class _LoginState extends State<Login> {
                       onPressed: () {
                         signInWithEmailAndPassword();
                       },
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -182,9 +165,10 @@ class _LoginState extends State<Login> {
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
+                              fontFamily: primaryFont,
                             ),
                           ),
-                          Icon(
+                          const Icon(
                             Icons.arrow_forward_ios_outlined,
                             color: Colors.white,
                           )
@@ -226,14 +210,20 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       onPressed: () {
-                        createUserWithEmailAndPassword();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SignUp(),
+                          ),
+                        );
                       },
-                      child: const Text(
+                      child: Text(
                         'Create an Account',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF77258B),
+                          color: const Color(0xFF77258B),
+                          fontFamily: primaryFont,
                         ),
                       ),
                     ),

@@ -28,10 +28,10 @@ class CustomTextField extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 90, 90, 90).withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 4),
+            color: Theme.of(context).colorScheme.shadow,
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 5),
           ),
         ],
         borderRadius: BorderRadius.circular(borderRadius),
@@ -50,7 +50,11 @@ class CustomTextField extends StatelessWidget {
           ),
           hintText: hintText,
           filled: true,
-          fillColor: color,
+          fillColor: Theme.of(context).colorScheme.secondary,
+          hintStyle: TextStyle(
+            fontFamily: primaryFont,
+            fontSize: 15,
+          ),
         ),
         obscureText: showHideText,
       ),
