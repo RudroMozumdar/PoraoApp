@@ -104,6 +104,32 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
+  // Create Account  Button ----------------------------------------------------
+  Widget _createAccountButton() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        elevation: 5,
+        shadowColor: const Color.fromARGB(255, 61, 61, 61),
+        minimumSize: const Size(double.infinity, 63),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+        ),
+      ),
+      onPressed: () {
+        createUserWithEmailAndPassword();
+      },
+      child: Text(
+        'Create an Account',
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: const Color(0xFF77258B),
+          fontFamily: primaryFont,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -149,28 +175,7 @@ class _SignUpState extends State<SignUp> {
               const SizedBox(height: 15),
               _nidField(),
               const SizedBox(height: 15),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  elevation: 5,
-                  shadowColor: const Color.fromARGB(255, 61, 61, 61),
-                  minimumSize: const Size(double.infinity, 63),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                ),
-                onPressed: () {
-                  createUserWithEmailAndPassword();
-                },
-                child: Text(
-                  'Create an Account',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF77258B),
-                    fontFamily: primaryFont,
-                  ),
-                ),
-              ),
+              _createAccountButton(),
             ]),
           ),
         ),
