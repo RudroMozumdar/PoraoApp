@@ -1,4 +1,4 @@
-import '../common/all_import.dart';
+import 'package:porao_app/common/all_import.dart';
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({super.key});

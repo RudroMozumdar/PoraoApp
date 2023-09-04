@@ -1,4 +1,4 @@
-import 'all_import.dart';
+import 'package:porao_app/common/all_import.dart';
 
 // Light Theme------------------------------------------------------------------
 ThemeData lightTheme = ThemeData(
@@ -8,7 +8,7 @@ ThemeData lightTheme = ThemeData(
     background: const Color.fromARGB(255, 36, 36, 36),
     primary: Colors.deepPurple,
     secondary: const Color.fromARGB(255, 255, 255, 255),
-    shadow: Color.fromARGB(166, 182, 182, 182),
+    shadow: const Color.fromARGB(166, 182, 182, 182),
     onPrimaryContainer: Colors.amber,
   ),
   useMaterial3: true,

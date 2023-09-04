@@ -1,4 +1,4 @@
-import '../common/all_import.dart';
+import 'package:porao_app/common/all_import.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({super.key});
@@ -135,48 +135,39 @@ class _SignUpState extends State<SignUp> {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color.fromARGB(255, 178, 134, 255), Colors.white],
+          colors: [
+            Color.fromARGB(255, 178, 134, 255),
+            Colors.white,
+          ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-            title: Text(
-              "Create a new account",
-              style: TextStyle(
-                fontFamily: primaryFont,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            centerTitle: true,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.arrow_back),
-            )),
+        appBar: const CustomAppBar(
+          title: "Create a new account",
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(children: [
-              _usernameField(),
-              const SizedBox(height: 15),
-              _emailField(),
-              const SizedBox(height: 15),
-              _passwordField(),
-              const SizedBox(height: 15),
-              _dobField(),
-              const SizedBox(height: 15),
-              _institutionField(),
-              const SizedBox(height: 15),
-              _nidField(),
-              const SizedBox(height: 15),
-              _createAccountButton(),
-            ]),
+            child: Column(
+              children: [
+                _usernameField(),
+                const SizedBox(height: 15),
+                _emailField(),
+                const SizedBox(height: 15),
+                _passwordField(),
+                const SizedBox(height: 15),
+                _dobField(),
+                const SizedBox(height: 15),
+                _institutionField(),
+                const SizedBox(height: 15),
+                _nidField(),
+                const SizedBox(height: 15),
+                _createAccountButton(),
+              ],
+            ),
           ),
         ),
       ),

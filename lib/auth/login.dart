@@ -1,4 +1,4 @@
-import '../common/all_import.dart';
+import 'package:porao_app/common/all_import.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
