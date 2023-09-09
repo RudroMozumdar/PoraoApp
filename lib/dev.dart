@@ -44,15 +44,38 @@ class _DevolopmentState extends State<Devolopment> {
             },
             child: const Text("Signup")),
         ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                ),
-              );
-            },
-            child: const Text("Homepage")),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          },
+          child: const Text("Homepage"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const StudentInformation(),
+              ),
+            );
+          },
+          child: const Text("Student Information"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UpdateInformation(),
+              ),
+            );
+          },
+          child: const Text("Update Information"),
+        ),
       ],
     );
   }
