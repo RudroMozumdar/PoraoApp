@@ -1,23 +1,24 @@
 import 'package:porao_app/common/all_import.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
-  final User? user = Auth().currentUser;
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Page"),
-        backgroundColor: const Color.fromARGB(169, 229, 243, 36),
-      ),
-      body: Container(
+    final User? user = Auth().currentUser;
+    return SingleChildScrollView(
+      child: Container(
         padding: const EdgeInsets.all(50),
         child: Column(
           children: [
             Text(
               user?.email ?? 'User Email',
-              style: const TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20, color: Colors.white),
             ),
             ElevatedButton(
               onPressed: () {

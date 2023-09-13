@@ -14,18 +14,30 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title,
         style: TextStyle(
           fontFamily: primaryFont,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
+          fontSize: 20,
+          fontWeight: FontWeight.w500,
+          color: Colors.black,
         ),
       ),
-      backgroundColor: Colors.transparent,
-      centerTitle: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(25))),
+      backgroundColor: const Color.fromARGB(255, 233, 158, 38),
       leading: IconButton(
         onPressed: () {
           Navigator.pop(context);
         },
-        icon: const Icon(Icons.arrow_back),
+        icon: const Icon(Icons.arrow_back_ios_new_rounded),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.search_rounded,
+            size: 30,
+            color: Colors.black,
+          ),
+        )
+      ],
     );
   }
 

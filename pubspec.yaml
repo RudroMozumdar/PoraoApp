@@ -14,6 +14,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   firebase_core: ^2.15.1
   firebase_auth: ^4.9.0
+  google_nav_bar: ^5.0.6
+
 
 dev_dependencies:
   flutter_test:
@@ -38,3 +40,6 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+        - asset: assets/fonts/Poppins-Medium.ttf
+        - asset: assets/fonts/Poppins-Light.ttf

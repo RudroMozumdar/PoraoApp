@@ -114,16 +114,16 @@ class _UpdateInformationState extends State<UpdateInformation> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: const CustomAppBar(
-          title: "Update Information",
+          title: "One More Step . . .",
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
-                const Text(
+                Text(
                   "Upload your pictures",
-                  style: TextStyle(fontSize: 17),
+                  style: TextStyle(fontSize: 17, fontFamily: primaryFont),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 15),
@@ -135,9 +135,9 @@ class _UpdateInformationState extends State<UpdateInformation> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                const Text(
+                Text(
                   "Add your experience in teaching field, preferred location, subjects and minimum expected salary",
-                  style: TextStyle(fontSize: 17),
+                  style: TextStyle(fontSize: 15, fontFamily: primaryFont),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 15),
