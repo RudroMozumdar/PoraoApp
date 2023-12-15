@@ -44,8 +44,8 @@ class _DashboardState extends State<Dashboard> {
               text: 'Home',
             ),
             GButton(
-              icon: Icons.feed,
-              text: 'Feed',
+              icon: Icons.add,
+              text: 'Ask',
             ),
             GButton(
               icon: Icons.notification_add,
@@ -79,11 +79,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color.fromARGB(255, 255, 184, 0), Colors.white],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
+        color: Colors.white,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -103,6 +99,9 @@ class _DashboardState extends State<Dashboard> {
 
         // Nav Bar
         bottomNavigationBar: _navBar(),
+        endDrawer: CustomDrawer(
+          username: Auth().currentUser?.email ?? 'User Email',
+        ),
       ),
     );
   }

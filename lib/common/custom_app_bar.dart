@@ -21,23 +21,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(25))),
-      backgroundColor: const Color.fromARGB(255, 233, 158, 38),
+      backgroundColor: primaryColor,
       leading: IconButton(
         onPressed: () {
           Navigator.pop(context);
         },
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
       ),
-      actions: [
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.search_rounded,
-            size: 30,
-            color: Colors.black,
-          ),
-        )
-      ],
+      // actions: [
+      //   IconButton(
+      //     onPressed: () {},
+      //     icon: const Icon(
+      //       Icons.menu,
+      //       size: 30,
+      //       color: Colors.black,
+      //     ),
+      //   )
+      // ],
     );
   }
 

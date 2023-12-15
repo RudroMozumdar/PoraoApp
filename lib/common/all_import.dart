@@ -14,6 +14,7 @@ export 'package:porao_app/dashboard/dashboard.dart';
 export 'package:porao_app/common/fonts.dart';
 export 'package:porao_app/common/colors.dart';
 export 'package:porao_app/common/custom_textfield.dart';
+export 'package:porao_app/common/custom_drawer.dart';
 export 'package:porao_app/common/themes.dart';
 export 'package:porao_app/common/custom_app_bar.dart';
 export 'package:porao_app/features/student_request.dart';

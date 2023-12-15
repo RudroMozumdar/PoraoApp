@@ -18,7 +18,8 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text(
               user?.email ?? 'User Email',
-              style: const TextStyle(fontSize: 20, color: Colors.white),
+              style: const TextStyle(
+                  fontSize: 20, color: Color.fromARGB(255, 0, 0, 0)),
             ),
             ElevatedButton(
               onPressed: () {
