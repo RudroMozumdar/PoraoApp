@@ -14,7 +14,7 @@ class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
       child: SingleChildScrollView(
         child: Column(
           children: [
-            drawerHeader(),
+            drawerHeader(context),
             drawerList(),
           ],
         ),
@@ -22,41 +22,51 @@ class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget drawerHeader() {
+  Widget drawerHeader(BuildContext context) {
     return Container(
       color: primaryColor,
       height: 200,
       width: double.infinity,
       padding: const EdgeInsets.only(top: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            height: 70,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                  image: AssetImage(
-                "assets/images/masud_high_quality.png",
-              )),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Profile(),
             ),
-          ),
-          const Text(
-            "Masud Hasan",
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
+          );
+        },
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              height: 70,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                    image: AssetImage(
+                  "assets/images/masud_high_quality.png",
+                )),
+              ),
             ),
-          ),
-          Text(
-            Auth().currentUser?.email ?? 'User Email',
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
+            const Text(
+              "Masud Hasan",
+              style: TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
             ),
-          ),
-        ],
+            Text(
+              Auth().currentUser?.email ?? 'User Email',
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

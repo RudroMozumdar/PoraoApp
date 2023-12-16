@@ -19,6 +19,7 @@ export 'package:porao_app/common/themes.dart';
 export 'package:porao_app/common/custom_app_bar.dart';
 export 'package:porao_app/features/student_request.dart';
 export 'package:porao_app/features/student_information.dart';
+export 'package:porao_app/profile/profile.dart';
 
 // Temporary
 export 'package:porao_app/temp/dev.dart';
