@@ -11,8 +11,8 @@ class _DashboardState extends State<Dashboard> {
   final PageController _pageController = PageController();
   var tabs = const [
     HomePage(),
-    TempStudentReq(),
-    TempStudetInfo(),
+    StudentRequests(),
+    StudentRequests(),
     HomePage(),
   ];
   var tabNames = const [
