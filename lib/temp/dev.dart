@@ -15,8 +15,7 @@ class _DevolopmentState extends State<Devolopment> {
         const SizedBox(height: 50),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const Login(),
               ),
@@ -26,8 +25,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const SignUp(),
               ),
@@ -37,8 +35,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const UpdateInformation(),
               ),
@@ -48,8 +45,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const Dashboard(),
               ),
@@ -59,8 +55,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const HomePage(),
               ),
@@ -70,8 +65,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const StudentRequests(),
               ),
@@ -81,8 +75,7 @@ class _DevolopmentState extends State<Devolopment> {
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(
-              context,
+            Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const StudentInformation(),
               ),

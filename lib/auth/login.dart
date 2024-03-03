@@ -156,8 +156,7 @@ class _LoginState extends State<Login> {
                       ),
                       onPressed: () {
                         signInWithEmailAndPassword();
-                        Navigator.push(
-                          context,
+                        Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const WidgetTree(),
                           ),
@@ -217,8 +216,7 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
+                        Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const SignUp(),
                           ),

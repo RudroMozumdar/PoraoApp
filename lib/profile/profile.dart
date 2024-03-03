@@ -114,8 +114,7 @@ class _ProfileState extends State<Profile> {
       child: InkWell(
         onTap: () {
           Auth().signOut();
-          Navigator.push(
-            context,
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const Login(),
             ),

@@ -30,8 +30,7 @@ class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
       padding: const EdgeInsets.only(top: 20),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const Profile(),
             ),

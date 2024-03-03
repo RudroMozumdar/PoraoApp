@@ -28,9 +28,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          post("Rudro Mozumdar", "assets/images/rudro.jpg", 0),
-          post("Jannatul Ferdous Sithi", "assets/images/jannat.jpg", 1),
-          post("Masud Hassan", "assets/images/masud.png", 2),
+          // post("Rudro Mozumdar", "assets/images/rudro.jpg", 0),
+          // post("Jannatul Ferdous Sithi", "assets/images/jannat.jpg", 1),
+          // post("Masud Hassan", "assets/images/masud.png", 2),
         ],
       ),
     );
@@ -89,35 +89,48 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget createPostSection() {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      decoration: BoxDecoration(
-        border: Border.all(
-          style: BorderStyle.solid,
-          width: 2,
-          color: const Color.fromARGB(255, 235, 235, 235),
-        ),
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Column(
-        children: [
-          Text(
-            "Have something on your mind?",
-            style: TextStyle(
-              fontSize: 20,
-              fontFamily: primaryFont,
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(HeroDialogRoute(builder: (context) {
+          return const CreatePost();
+        }));
+      },
+      child: Hero(
+        tag: 'createPost',
+        child: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 5),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                style: BorderStyle.solid,
+                width: 2,
+                color: const Color.fromARGB(255, 230, 230, 230),
+              ),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  "Have something on your mind?",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontFamily: primaryFont,
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Icon(
+                    Icons.add_rounded,
+                    size: 60,
+                    color: Color.fromARGB(255, 122, 122, 122),
+                  ),
+                )
+              ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(10),
-            child: Icon(
-              Icons.add_rounded,
-              size: 60,
-              color: Colors.grey,
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
