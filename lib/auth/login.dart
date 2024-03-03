@@ -26,6 +26,7 @@ class _LoginState extends State<Login> {
       setState(() {
         errorMessage = e.message;
       });
+      print("----------------error---------------");
     }
   }
 
@@ -155,6 +156,12 @@ class _LoginState extends State<Login> {
                       ),
                       onPressed: () {
                         signInWithEmailAndPassword();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WidgetTree(),
+                          ),
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

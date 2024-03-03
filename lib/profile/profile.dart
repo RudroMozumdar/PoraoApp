@@ -9,6 +9,7 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   @override
+  @override
   Widget build(BuildContext context) {
     return Material(
       child: Container(
@@ -112,10 +113,11 @@ class _ProfileState extends State<Profile> {
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: InkWell(
         onTap: () {
+          Auth().signOut();
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const HomePage(),
+              builder: (context) => const Login(),
             ),
           );
         },
