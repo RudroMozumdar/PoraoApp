@@ -13,13 +13,13 @@ class _DashboardState extends State<Dashboard> {
     HomePage(),
     StudentRequests(),
     StudentRequests(),
-    HomePage(),
+    MyPosts(),
   ];
   var tabNames = const [
     "Homepage",
     "Studet Request",
     "Studet Information",
-    "Pranto",
+    "My Posts",
   ];
   var _currentTab = 0;
 

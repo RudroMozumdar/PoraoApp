@@ -9,6 +9,7 @@ class CreatePost extends StatefulWidget {
 
 class _CreatePostState extends State<CreatePost> {
   final TextEditingController _controllerPostContent = TextEditingController();
+  final TextEditingController _controllerPostTitle = TextEditingController();
 
   Future<void> createQuestionPost(String title, String content) async {
     final user = FirebaseAuth.instance.currentUser;
@@ -56,7 +57,35 @@ class _CreatePostState extends State<CreatePost> {
                         color: Colors.white,
                       ),
                     ),
-                    // Text Field-----------------------------------------------
+                    // Title Text Field-----------------------------------------
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: TextField(
+                        controller: _controllerPostTitle,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          border: const OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                          hintText: 'Title of yout question, please.',
+                          filled: true,
+                          fillColor: Theme.of(context).colorScheme.secondary,
+                          hintStyle: TextStyle(
+                            fontFamily: primaryFont,
+                            fontSize: 15,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    // Content Text Field --------------------------------------
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
                       child: TextField(
@@ -69,12 +98,16 @@ class _CreatePostState extends State<CreatePost> {
                               Radius.circular(15),
                             ),
                           ),
-                          hintText: 'Whats on your mind?',
+                          hintText: 'Elaborate your question...',
                           filled: true,
                           fillColor: Theme.of(context).colorScheme.secondary,
                           hintStyle: TextStyle(
                             fontFamily: primaryFont,
                             fontSize: 15,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 50,
+                            horizontal: 10,
                           ),
                         ),
                       ),
@@ -93,7 +126,9 @@ class _CreatePostState extends State<CreatePost> {
                           child: ElevatedButton(
                             onPressed: () {
                               createQuestionPost(
-                                  "Hello", "This is my question");
+                                _controllerPostTitle.text,
+                                _controllerPostContent.text,
+                              );
                             },
                             child: const Text('Post'),
                           ),
