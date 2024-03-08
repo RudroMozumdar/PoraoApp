@@ -8,8 +8,27 @@ class CreatePost extends StatefulWidget {
 }
 
 class _CreatePostState extends State<CreatePost> {
-  @override
   final TextEditingController _controllerPostContent = TextEditingController();
+
+  Future<void> createQuestionPost(String title, String content) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return; // Handle user not authenticated case
+    }
+
+    final docRef = FirebaseFirestore.instance.collection('posts').doc();
+    //final postId = docRef.id;
+
+    await docRef.set({
+      'authorId': user.uid,
+      'title': title,
+      'content': content,
+      'createdAt': Timestamp.now(),
+      'upvotes': [],
+      'downvotes': [],
+      'answers': {},
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +91,12 @@ class _CreatePostState extends State<CreatePost> {
                         Padding(
                           padding: const EdgeInsets.all(5),
                           child: ElevatedButton(
-                              onPressed: () {}, child: const Text('Post')),
+                            onPressed: () {
+                              createQuestionPost(
+                                  "Hello", "This is my question");
+                            },
+                            child: const Text('Post'),
+                          ),
                         ),
                       ],
                     ),

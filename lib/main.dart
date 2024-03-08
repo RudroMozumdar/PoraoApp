@@ -1,8 +1,9 @@
 import 'package:porao_app/common/all_import.dart';
+import 'package:porao_app/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -33,8 +34,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    // return const WidgetTree();
-    return const Devolopment(); // Temporary
+    return const WidgetTree();
+    // return const Devolopment(); // Temporary
     //return const AnimatedContainerPopup(); // Temporary
   }
 }
