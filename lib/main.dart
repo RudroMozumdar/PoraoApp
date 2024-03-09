@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Porate Chai',
       theme: lightTheme,
-      darkTheme: darkTheme,
+      // darkTheme: darkTheme,
       home: const MyHomePage(title: 'Porate Chai Home Page'),
       debugShowCheckedModeBanner: false,
     );

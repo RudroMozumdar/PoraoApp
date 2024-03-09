@@ -22,6 +22,7 @@ class _CreatePostState extends State<CreatePost> {
 
     await docRef.set({
       'authorId': user.uid,
+      // 'privacy': 1,
       'title': title,
       'content': content,
       'createdAt': Timestamp.now(),
