@@ -22,6 +22,7 @@ export 'package:porao_app/common/custom_post_card.dart';
 export 'package:porao_app/common/themes.dart';
 export 'package:porao_app/common/custom_app_bar.dart';
 export 'package:porao_app/common/custom_hero_dialog_route.dart';
+export 'package:porao_app/common/common_methods.dart';
 export 'package:porao_app/features/student_request.dart';
 export 'package:porao_app/features/student_information.dart';
 export 'package:porao_app/profile/profile.dart';

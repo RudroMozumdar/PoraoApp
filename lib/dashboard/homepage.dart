@@ -28,9 +28,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-          // post("Rudro Mozumdar", "assets/images/rudro.jpg", 0),
-          // post("Jannatul Ferdous Sithi", "assets/images/jannat.jpg", 1),
-          // post("Masud Hassan", "assets/images/masud.png", 2),
+          // questions(),
         ],
       ),
     );
@@ -135,182 +133,158 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget post(String name, String image, int index) {
-    return Container(
-      margin: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          width: 2,
-          color: const Color.fromARGB(255, 230, 230, 230),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Details -------------------------------------------------------
-          Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.all(10),
-                height: 50,
-                width: 50,
+  Widget questions() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: SizedBox(
+              width: 50.0, // Adjust the width as needed
+              height: 50.0, // Adjust the height as needed
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        return ListView.builder(
+          itemCount: snapshot.data?.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot post = snapshot.data!.docs[index];
+            final timestamp = post['createdAt'] as Timestamp;
+            var vote = 0;
+
+            // Check if voted already or not--------------------------------------------
+            if (post['upvotes'].contains(Auth().currentUser?.uid)) {
+              vote = 1;
+            } else if (post['downvotes']
+                .contains(FirebaseAuth.instance.currentUser?.uid)) {
+              vote = -1;
+            }
+
+            DocumentReference docRef =
+                FirebaseFirestore.instance.collection('posts').doc(post.id);
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              child: Container(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: AssetImage(image),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(
-                  top: 10,
-                  bottom: 10,
-                  right: 10,
-                ),
+                    borderRadius: BorderRadius.circular(15),
+                    color: seconderyColor),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: TextStyle(
-                        fontFamily: primaryFont,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                    ListTile(
+                      title: Text(post['title']),
+                      subtitle: Text(post['content']),
                     ),
-                    Text(
-                      "23Y, Computer Science & Engineering",
-                      style: TextStyle(
-                        fontFamily: primaryFont,
-                        fontSize: 12,
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Text(formatTimeDifference(
+                          DateTime.now().difference(timestamp.toDate()))),
                     ),
-                    Text(
-                      "11 Hours Ago",
-                      style: TextStyle(
-                        fontFamily: primaryFont,
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
+                    // ------------------------------------------------------------------Action Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // ---------------------------------------------------------------Upvote button
+                        Container(
+                          decoration: BoxDecoration(
+                            color:
+                                vote == 1 ? primaryColor : Colors.transparent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              if (vote == 0) {
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayUnion(
+                                      [Auth().currentUser?.uid])
+                                });
+                              } else if (vote == -1) {
+                                docRef.update({
+                                  'downvotes': FieldValue.arrayRemove(
+                                      [Auth().currentUser?.uid])
+                                });
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayUnion(
+                                      [Auth().currentUser?.uid])
+                                });
+                              } else {
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayRemove(
+                                      [Auth().currentUser?.uid])
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.arrow_upward_rounded),
+                            tooltip: 'Upvote',
+                            color: vote == 1 ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        Text((post['upvotes'].length - post['downvotes'].length)
+                            .toString()),
+                        // -----------------------------------------------------------------Downvote Button
+                        Container(
+                          decoration: BoxDecoration(
+                            color:
+                                vote == -1 ? primaryColor : Colors.transparent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              if (vote == 0) {
+                                docRef.update({
+                                  'downvotes': FieldValue.arrayUnion(
+                                      [Auth().currentUser?.uid])
+                                });
+                              } else if (vote == 1) {
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayRemove(
+                                      [Auth().currentUser?.uid])
+                                });
+                                docRef.update({
+                                  'downvotes': FieldValue.arrayUnion(
+                                      [Auth().currentUser?.uid])
+                                });
+                              } else {
+                                docRef.update({
+                                  'downvotes': FieldValue.arrayRemove(
+                                      [Auth().currentUser?.uid])
+                                });
+                              }
+                            },
+                            icon: const Icon(Icons.arrow_downward_rounded),
+                            tooltip: 'Downvote',
+                            color: vote == -1 ? Colors.white : Colors.black,
+                          ),
+                        ),
+                        const SizedBox(width: 30),
+                        IconButton(
+                          onPressed: () {
+                            showBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return const Text('data');
+                              },
+                            );
+                          },
+                          icon: const Icon(Icons.comment),
+                        ),
+                        const SizedBox(width: 30),
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(Icons.share),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 5),
                   ],
                 ),
               ),
-              const Spacer(),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    selectedList[index] = !selectedList[index];
-                  });
-                },
-                icon: Icon(
-                  selectedList[index]
-                      ? Icons.arrow_drop_down_rounded
-                      : Icons.arrow_drop_up_rounded,
-                ),
-              ),
-            ],
-          ),
-          // Main Post -----------------------------------------------------
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.fastEaseInToSlowEaseOut,
-            height: selectedList[index] ? 180 : 65,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Expanded(
-              child: Text(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                style: TextStyle(
-                  fontFamily: primaryFont,
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.justify,
-                maxLines: selectedList[index] ? 100 : 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          // Reacts --------------------------------------------------------
-          Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 14, left: 14, right: 14),
-                child: Icon(
-                  Icons.favorite,
-                  color: Colors.red[400],
-                  size: 19,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 14),
-                child: Text(
-                  "150 People",
-                  style: TextStyle(
-                    fontFamily: primaryFont,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const Divider(indent: 10, endIndent: 10),
-          // Actions ------------------------------------------------------
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    voteCounter[index]++;
-                  });
-                },
-                icon: const Icon(Icons.keyboard_double_arrow_up_sharp),
-              ),
-              Text(voteCounter[index].toString()),
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    voteCounter[index]--;
-                  });
-                },
-                icon: const Icon(Icons.keyboard_double_arrow_down_sharp),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.recommend),
-                label: Text(
-                  "Recomend",
-                  style: TextStyle(
-                      fontFamily: primaryFont,
-                      fontSize: 12,
-                      color: const Color.fromARGB(255, 131, 131, 131)),
-                ),
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.white),
-                  elevation: MaterialStatePropertyAll(0),
-                  iconColor: MaterialStatePropertyAll(Colors.grey),
-                ),
-              ),
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.question_answer),
-                label: Text(
-                  "Answer",
-                  style: TextStyle(
-                      fontFamily: primaryFont,
-                      fontSize: 12,
-                      color: const Color.fromARGB(255, 131, 131, 131)),
-                ),
-                style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.white),
-                  elevation: MaterialStatePropertyAll(0),
-                  iconColor: MaterialStatePropertyAll(Colors.grey),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }

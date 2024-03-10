@@ -8,23 +8,6 @@ class MyPosts extends StatefulWidget {
 }
 
 class _MyPostsState extends State<MyPosts> {
-  String formatTimeDifference(Duration difference) {
-    final seconds = difference.inSeconds;
-    final minutes = difference.inMinutes;
-    final hours = difference.inHours;
-    final days = difference.inDays;
-
-    if (days > 0) {
-      return '$days day${days > 1 ? 's' : ''}';
-    } else if (hours > 0) {
-      return '$hours hr${hours > 1 ? 's' : ''}';
-    } else if (minutes > 0) {
-      return '$minutes min${minutes > 1 ? 's' : ''}';
-    } else {
-      return '$seconds sec${seconds > 1 ? 's' : ''}';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -39,6 +22,7 @@ class _MyPostsState extends State<MyPosts> {
             ),
           );
         }
+
         return ListView.builder(
           itemCount: snapshot.data?.docs.length,
           itemBuilder: (context, index) {
@@ -53,6 +37,8 @@ class _MyPostsState extends State<MyPosts> {
                 .contains(FirebaseAuth.instance.currentUser?.uid)) {
               vote = -1;
             }
+
+            final answerController = TextEditingController();
 
             DocumentReference docRef =
                 FirebaseFirestore.instance.collection('posts').doc(post.id);
@@ -153,7 +139,73 @@ class _MyPostsState extends State<MyPosts> {
                         ),
                         const SizedBox(width: 30),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showBottomSheet(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: MediaQuery.of(context)
+                                          .viewInsets
+                                          .bottom),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: seconderyButtonColor,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: TextField(
+                                            controller: answerController,
+                                            keyboardType: TextInputType.text,
+                                            decoration: InputDecoration(
+                                              border: const OutlineInputBorder(
+                                                borderSide: BorderSide.none,
+                                                borderRadius: BorderRadius.all(
+                                                  Radius.circular(15),
+                                                ),
+                                              ),
+                                              hintText: 'Write your answer',
+                                              filled: true,
+                                              fillColor: Theme.of(context)
+                                                  .colorScheme
+                                                  .secondary,
+                                              hintStyle: TextStyle(
+                                                fontFamily: primaryFont,
+                                                fontSize: 15,
+                                              ),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 10,
+                                                horizontal: 10,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            var xml = {
+                                              "authorId":
+                                                  Auth().currentUser?.uid,
+                                              "content": answerController.text,
+                                              "createdAt": Timestamp.now(),
+                                            };
+                                            docRef.update({
+                                              'answers':
+                                                  FieldValue.arrayUnion([xml])
+                                            });
+                                          },
+                                          child: const Text('Submit'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          },
                           icon: const Icon(Icons.comment),
                         ),
                         const SizedBox(width: 30),
