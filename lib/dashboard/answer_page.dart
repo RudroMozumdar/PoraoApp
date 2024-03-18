@@ -1,14 +1,112 @@
 import 'package:porao_app/common/all_import.dart';
-import 'package:porao_app/dashboard/answer_page.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class AnswerPage extends StatelessWidget {
+  final String questionTitle;
+  final String questionContent;
+
+  const AnswerPage(
+      {super.key, required this.questionTitle, required this.questionContent});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Answer'),
+        backgroundColor: primaryColor,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(
+            top: 16.0, bottom: 16.0), // Remove default padding if any
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              questionTitle,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(questionContent),
+            const SizedBox(height: 10), // Add spacing before the container
+            SizedBox(
+              width: double.infinity, // Make the container fill available width
+              child: Container(
+                decoration: BoxDecoration(
+                  color: primaryColor, // Adjust the color as needed
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                // Remove padding for full width usage (optional)
+                // padding: EdgeInsets.zero,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            final keyboardHeight =
+                                MediaQuery.of(context).viewInsets.bottom;
+
+                            return Container(
+                              padding: EdgeInsets.only(
+                                  bottom:
+                                      keyboardHeight), // Adjust padding dynamically
+                              child: Row(
+                                children: [
+                                  const Expanded(
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        hintText: 'Enter your comment...',
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    icon: const Icon(Icons.send),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.comment),
+                    ),
+                    IconButton(
+                      onPressed: () {}, // Implement button logic
+                      icon: const Icon(Icons.arrow_upward_rounded),
+                    ),
+                    IconButton(
+                      onPressed: () {}, // Implement button logic
+                      icon: const Icon(Icons.arrow_downward_rounded),
+                    ),
+                    IconButton(
+                      onPressed: () {}, // Implement button logic
+                      icon: const Icon(Icons.share),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Add your answer input field and submit button here
+          ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
+class AnswerSection extends StatefulWidget {
+  const AnswerSection({super.key});
+
+  @override
+  State<AnswerSection> createState() => _AnswerSection();
+}
+
+class _AnswerSection extends State<AnswerSection> {
   List<bool> selectedList = [false, false, false];
   List<int> voteCounter = [0, 0, 0];
 
@@ -17,21 +115,9 @@ class _HomePageState extends State<HomePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          header("Rudro Mozumdar", "assets/images/rudro.jpg"),
-          createPostSection(context),
-          Container(
-            padding: const EdgeInsets.only(top: 20, left: 10),
-            width: double.infinity,
-            child: Text(
-              "Your daily question feed",
-              style: TextStyle(
-                fontFamily: primaryFont,
-                fontSize: 20,
-              ),
-            ),
-          ),
           StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('posts').snapshots(),
+            stream:
+                FirebaseFirestore.instance.collection('comments').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(
@@ -43,30 +129,29 @@ class _HomePageState extends State<HomePage> {
                 );
               }
 
-              final posts = snapshot.data!.docs;
+              final comments = snapshot.data!.docs;
 
               return ListView.builder(
-                shrinkWrap: true, // Makes the list view have a fixed height
-                physics:
-                    const NeverScrollableScrollPhysics(), // Disables scrolling
-                itemCount: posts.length,
+                shrinkWrap: true, // Correction: Added closing parenthesis
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: comments.length,
                 itemBuilder: (context, index) {
-                  DocumentSnapshot post = posts[index];
-                  final timestamp = post['createdAt'] as Timestamp;
+                  DocumentSnapshot comment = comments[index];
+                  final timestamp = comment['createdAt'] as Timestamp;
                   var vote = 0;
 
                   // Check if user has already voted
-                  if (post['upvotes'].contains(Auth().currentUser?.uid)) {
+                  if (comment['upvotes'].contains(Auth().currentUser?.uid)) {
                     vote = 1;
-                  } else if (post['downvotes']
+                  } else if (comment['downvotes']
                       .contains(FirebaseAuth.instance.currentUser?.uid)) {
                     vote = -1;
                   }
 
                   final answerController = TextEditingController();
                   DocumentReference docRef = FirebaseFirestore.instance
-                      .collection('posts')
-                      .doc(post.id);
+                      .collection('comments')
+                      .doc(comment.id);
 
                   return Padding(
                     padding: const EdgeInsets.symmetric(
@@ -80,8 +165,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ListTile(
-                            title: Text(post['title']),
-                            subtitle: Text(post['content']),
+                            title: Text(comment['comment']),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 16),
@@ -129,8 +213,8 @@ class _HomePageState extends State<HomePage> {
                                       vote == 1 ? Colors.white : Colors.black,
                                 ),
                               ),
-                              Text((post['upvotes'].length -
-                                      post['downvotes'].length)
+                              Text((comment['upvotes'].length -
+                                      comment['downvotes'].length)
                                   .toString()),
                               // -----------------------------------------------------------------Downvote Button
                               Container(
@@ -177,8 +261,8 @@ class _HomePageState extends State<HomePage> {
                               IconButton(
                                 onPressed: () {
                                   // Get the question data (replace with your actual way of accessing data)
-                                  final String title = post['title'];
-                                  final String content = post['content'];
+                                  final String title = comment['title'];
+                                  final String content = comment['content'];
 
                                   // Navigate to the AnswerPage with data
                                   Navigator.push(
@@ -206,103 +290,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
-
-Widget header(String name, String image) {
-  return Row(
-    children: [
-      Container(
-        margin: const EdgeInsets.all(10),
-        height: 75,
-        width: 75,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          image: DecorationImage(
-            image: AssetImage(image),
-          ),
-        ),
-      ),
-      Container(
-        padding: const EdgeInsets.only(
-          top: 10,
-          bottom: 10,
-          right: 10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Welcome",
-              style: TextStyle(
-                fontFamily: primaryFont,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              name,
-              style: TextStyle(
-                fontFamily: primaryFont,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            Text(
-              "24Y, Computer Science & Engineering",
-              style: TextStyle(
-                fontFamily: primaryFont,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ],
-  );
-}
-
-Widget createPostSection(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.of(context).push(HeroDialogRoute(builder: (context) {
-        return const CreatePost();
-      }));
-    },
-    child: Hero(
-      tag: 'createPost',
-      child: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              style: BorderStyle.solid,
-              width: 2,
-              color: const Color.fromARGB(255, 230, 230, 230),
-            ),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Column(
-            children: [
-              Text(
-                "Have something on your mind?",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: primaryFont,
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(10),
-                child: Icon(
-                  Icons.add_rounded,
-                  size: 60,
-                  color: Color.fromARGB(255, 122, 122, 122),
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }
