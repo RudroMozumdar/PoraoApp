@@ -176,9 +176,6 @@ Widget questions(BuildContext context) {
           DocumentReference docRef =
               FirebaseFirestore.instance.collection('posts').doc(post.id);
 
-          Reference referanceRoot = FirebaseStorage.instance.ref();
-          Reference referenceDirDP = referanceRoot.child('display-pictures');
-
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Container(
