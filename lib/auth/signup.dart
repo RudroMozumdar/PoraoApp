@@ -52,6 +52,8 @@ class _SignUpState extends State<SignUp> {
     final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
     await docRef.set({
+      'dp-url':
+          'https://static.vecteezy.com/system/resources/thumbnails/002/387/693/small/user-profile-icon-free-vector.jpg',
       'name': _controllerUserame.text,
       'date-of-birth': dateOfBirth,
       'institution-name': _controllerInstitution.text,
