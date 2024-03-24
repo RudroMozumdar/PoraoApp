@@ -10,6 +10,7 @@ class CustomTextField extends StatelessWidget {
   TextInputType? textInpputType;
   Color? color;
   bool showHideText;
+  bool readOnly;
   CustomTextField({
     super.key,
     required this.hintText,
@@ -19,6 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.textInpputType,
     this.color,
     this.sufffixIcon,
+    this.readOnly = false,
     this.showHideText = false,
   });
 
@@ -57,6 +59,7 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         obscureText: showHideText,
+        readOnly: readOnly,
       ),
     );
   }

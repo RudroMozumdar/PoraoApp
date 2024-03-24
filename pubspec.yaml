@@ -15,8 +15,10 @@ dependencies:
   firebase_core: ^2.15.1
   firebase_auth: ^4.9.0
   cloud_firestore: ^4.15.8
+  firebase_storage: ^11.6.10
   google_nav_bar: ^5.0.6
   audioplayers: ^5.2.1
+  rxdart: ^0.27.7
 
 
 dev_dependencies:

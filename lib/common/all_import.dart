@@ -1,5 +1,6 @@
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:firebase_core/firebase_core.dart';
+export 'package:firebase_storage/firebase_storage.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutter/material.dart';
 export 'package:google_nav_bar/google_nav_bar.dart';
@@ -14,6 +15,7 @@ export 'package:porao_app/dashboard/homepage.dart';
 export 'package:porao_app/dashboard/dashboard.dart';
 export 'package:porao_app/dashboard/my_posts.dart';
 export 'package:porao_app/dashboard/create_post.dart';
+export 'package:porao_app/dashboard/answer_page.dart';
 export 'package:porao_app/common/fonts.dart';
 export 'package:porao_app/common/colors.dart';
 export 'package:porao_app/common/custom_textfield.dart';

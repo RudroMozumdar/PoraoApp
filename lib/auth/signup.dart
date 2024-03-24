@@ -15,6 +15,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _controllerPassword = TextEditingController();
   final TextEditingController _controllerUserame = TextEditingController();
   final TextEditingController _controllerDOB = TextEditingController();
+  late DateTime dateOfBirth;
   final TextEditingController _controllerInstitution = TextEditingController();
   final TextEditingController _controllerNID = TextEditingController();
 
@@ -26,11 +27,36 @@ class _SignUpState extends State<SignUp> {
         email: _controllerEmail.text,
         password: _controllerPassword.text,
       );
+      await createUser();
+      if (context.mounted) {
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const WidgetTree(),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
       });
     }
+  }
+
+  Future<void> createUser() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    await docRef.set({
+      'name': _controllerUserame.text,
+      'date-of-birth': dateOfBirth,
+      'institution-name': _controllerInstitution.text,
+      'nid': _controllerNID.text,
+    });
   }
 
   //Username Field -------------------------------------------------------------
@@ -79,8 +105,14 @@ class _SignUpState extends State<SignUp> {
     return CustomTextField(
       hintText: "Date of Birth",
       prefixIcon: const Icon(Icons.calendar_today_outlined),
+      sufffixIcon: IconButton(
+          onPressed: () {
+            _selectDate();
+          },
+          icon: const Icon(Icons.calendar_month_rounded)),
       borderRadius: 40,
       controller: _controllerDOB,
+      readOnly: true,
     );
   }
 
@@ -128,6 +160,21 @@ class _SignUpState extends State<SignUp> {
         ),
       ),
     );
+  }
+
+  Future<void> _selectDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1980),
+      lastDate: DateTime.now(),
+      initialDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _controllerDOB.text = picked.toString().split(" ")[0];
+        dateOfBirth = picked;
+      });
+    }
   }
 
   @override

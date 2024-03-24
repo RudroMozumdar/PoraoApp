@@ -1,4 +1,5 @@
 import 'package:porao_app/common/all_import.dart';
+import 'package:porao_app/common/fonts.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({super.key});
@@ -10,19 +11,30 @@ class CreatePost extends StatefulWidget {
 class _CreatePostState extends State<CreatePost> {
   final TextEditingController _controllerPostContent = TextEditingController();
   final TextEditingController _controllerPostTitle = TextEditingController();
+  String privacyStatus = 'private';
 
-  Future<void> createQuestionPost(String title, String content) async {
+  Future<void> createQuestionPost(
+      String title, String content, String privacy) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      return; // Handle user not authenticated case
+      return;
     }
 
     final docRef = FirebaseFirestore.instance.collection('posts').doc();
-    //final postId = docRef.id;
 
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(user.uid)
+        .get();
+
+    String name = snapshot.data()!['name'];
+    String dpurl = snapshot.data()!['dp-url'];
     await docRef.set({
+      'dp-url': dpurl,
       'authorId': user.uid,
-      // 'privacy': 1,
+      'authorName': name,
+      'privacy': privacy,
       'title': title,
       'content': content,
       'createdAt': Timestamp.now(),
@@ -50,13 +62,66 @@ class _CreatePostState extends State<CreatePost> {
                 ),
                 child: Column(
                   children: [
-                    Text(
-                      "Create Post",
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontFamily: primaryFont,
-                        color: Colors.white,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text(
+                            "Create Post",
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontFamily: primaryFont,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: DropdownButton(
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: primaryFont,
+                              fontSize: 15,
+                            ),
+                            icon: const Icon(
+                              Icons.public,
+                              color: Colors.white,
+                            ),
+                            dropdownColor: primaryButtonColor,
+                            value: privacyStatus,
+                            items: [
+                              DropdownMenuItem(
+                                value: 'private',
+                                child: Text(
+                                  'Private',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: primaryFont,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'public',
+                                child: Text(
+                                  'Public',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: primaryFont,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                privacyStatus = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                     // Title Text Field-----------------------------------------
                     Padding(
@@ -129,7 +194,19 @@ class _CreatePostState extends State<CreatePost> {
                               createQuestionPost(
                                 _controllerPostTitle.text,
                                 _controllerPostContent.text,
+                                privacyStatus,
                               );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Post Added Successfully.",
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontFamily: primaryFont),
+                                  ),
+                                ),
+                              );
+                              Navigator.of(context).pop();
                             },
                             child: const Text('Post'),
                           ),
