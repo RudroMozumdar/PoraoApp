@@ -13,6 +13,7 @@ export 'package:porao_app/auth/widget_tree.dart';
 export 'package:porao_app/auth/update_information.dart';
 export 'package:porao_app/dashboard/homepage.dart';
 export 'package:porao_app/dashboard/dashboard.dart';
+export 'package:porao_app/dashboard/messages_threads.dart';
 export 'package:porao_app/dashboard/my_posts.dart';
 export 'package:porao_app/dashboard/create_post.dart';
 export 'package:porao_app/dashboard/answer_page.dart';

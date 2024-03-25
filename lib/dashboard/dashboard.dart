@@ -12,13 +12,13 @@ class _DashboardState extends State<Dashboard> {
   var tabs = const [
     HomePage(),
     StudentRequests(),
-    StudentRequests(),
+    MessagesThreads(),
     MyPosts(),
   ];
   var tabNames = const [
     "Homepage",
-    "Studet Request",
-    "Studet Information",
+    "Ask and Search",
+    "Threads & Messages",
     "My Posts",
   ];
   var _currentTab = 0;
@@ -41,19 +41,15 @@ class _DashboardState extends State<Dashboard> {
           tabs: const [
             GButton(
               icon: Icons.home_rounded,
-              text: 'Home',
             ),
             GButton(
-              icon: Icons.add,
-              text: 'Ask',
+              icon: Icons.search,
             ),
             GButton(
-              icon: Icons.notification_add,
-              text: 'Noti',
+              icon: Icons.message,
             ),
             GButton(
-              icon: Icons.person,
-              text: 'Profile',
+              icon: Icons.notifications,
             ),
           ],
           selectedIndex: _currentTab,
