@@ -49,13 +49,13 @@ class _LoginState extends State<Login> {
             Container(
               padding: EdgeInsets.only(top: isKeyboardOpen ? 40 : 100),
               alignment: Alignment.topCenter,
-              child: Text(
-                "Porate Chai",
+              child: const Text(
+                "Porao",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 40,
+                  fontSize: 60,
                   fontWeight: FontWeight.bold,
-                  fontFamily: primaryFont,
+                  fontFamily: 'IrishGrover',
                 ),
               ),
             ),

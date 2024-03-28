@@ -48,3 +48,6 @@ flutter:
         - asset: assets/fonts/Poppins-Bold.ttf
         - asset: assets/fonts/Poppins-Medium.ttf
         - asset: assets/fonts/Poppins-Light.ttf
+    - family: IrishGrover
+      fonts:
+        - asset: assets/fonts/IrishGrover-Regular.ttf

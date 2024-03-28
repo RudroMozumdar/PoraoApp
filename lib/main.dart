@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Porate Chai',
+      title: 'PORAO',
       theme: lightTheme,
       // darkTheme: darkTheme,
       home: const MyHomePage(title: 'Porate Chai Home Page'),
