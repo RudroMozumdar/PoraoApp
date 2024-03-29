@@ -106,7 +106,7 @@ class _MessagesThreads extends State<MessagesThreads>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // Content for Inbox tab
+                  // Content for THREADS tab
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -116,7 +116,10 @@ class _MessagesThreads extends State<MessagesThreads>
                       child: Text('Threads Content'),
                     ),
                   ),
+
+                  // Content for MESSAGES Tab
                   Container(
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(45.0),
