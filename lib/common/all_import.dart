@@ -31,6 +31,10 @@ export 'package:porao_app/common/common_methods.dart';
 export 'package:porao_app/features/student_request.dart';
 export 'package:porao_app/features/student_information.dart';
 export 'package:porao_app/profile/profile.dart';
+export 'package:porao_app/profile/feedback.dart';
+export 'package:porao_app/profile/faq.dart';
+export 'package:porao_app/profile/app_settings.dart';
+export 'package:porao_app/profile/personal_details.dart';
 
 // Temporary
 export 'package:porao_app/temp/dev.dart';

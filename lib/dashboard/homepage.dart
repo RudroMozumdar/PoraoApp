@@ -81,9 +81,9 @@ Widget header(String name, String image) {
 Widget createPostSection(BuildContext context) {
   return GestureDetector(
     onTap: () {
-      Navigator.of(context).push(HeroDialogRoute(builder: (context) {
-        return const CreatePost();
-      }));
+      // Navigator.of(context).push(HeroDialogRoute(builder: (context) {
+      //   return const CreatePost();
+      // }));
     },
     child: Hero(
       tag: 'createPost',

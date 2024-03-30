@@ -95,11 +95,49 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
                 const Divider(endIndent: 30, indent: 30),
-                options("Personal Details", Icons.person),
-                options("Settings", Icons.settings),
-                options("Feedack", Icons.format_quote),
-                options("FAQ", Icons.feedback),
-                options("Log Out", Icons.logout),
+                options(
+                    "Personal Details", Icons.person, const PersonalDetails()),
+                options("Settings", Icons.settings, const AppSettings()),
+                options("Feedack", Icons.format_quote, const FeedBack()),
+                options("FAQ", Icons.feedback, const Faq()),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: InkWell(
+                    onTap: () {
+                      Auth().signOut();
+                      Navigator.of(context, rootNavigator: true)
+                          .pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return const Login();
+                          },
+                        ),
+                        (_) => false,
+                      );
+                    },
+                    child: Container(
+                      width: 320,
+                      decoration: const BoxDecoration(
+                          color: Color.fromARGB(0, 0, 0, 0)),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.logout),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Log Out',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: const Color.fromARGB(255, 0, 0, 0),
+                              fontFamily: primaryFont,
+                            ),
+                          ),
+                          const Spacer(),
+                          const Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -108,20 +146,15 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  Widget options(String title, IconData icon) {
+  Widget options(String title, IconData icon, Widget page) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: InkWell(
         onTap: () {
-          Auth().signOut();
-          Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (BuildContext context) {
-                return const Login();
-              },
-            ),
-            (_) => false,
-          );
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (BuildContext context) {
+            return page;
+          }));
         },
         child: Container(
           width: 320,
