@@ -1,3 +1,7 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class MessagesThreads extends StatefulWidget {
@@ -15,26 +19,49 @@ class _MessagesThreads extends State<MessagesThreads>
 
   List<Map<String, dynamic>>? filteredDocuments; // Initialize as null
 
+  var currentUser = FirebaseAuth.instance.currentUser;
+
   Future<void> _fetchAndFilterMessages() async {
-    var currentUser = FirebaseAuth.instance.currentUser;
     filteredDocuments = await fetchAndFilterByUserId(currentUser!.uid);
     setState(() {}); // Trigger rebuild with updated data
+  }
+
+  String _formatTimestampForDisplay(dynamic timestampValue) {
+    Timestamp firebaseTimestamp = timestampValue as Timestamp;
+    DateTime dateTime = firebaseTimestamp.toDate();
+
+    // Define the desired format pattern
+    final formattedDate = DateFormat('h:mm a, d MMM, yyyy').format(dateTime);
+    return formattedDate;
   }
 
   Future<List<Map<String, dynamic>>> fetchAndFilterByUserId(
     String currentUserId,
   ) async {
     final collectionRef = _firestore.collection('messages');
+    collectionRef.orderBy("last_time", descending: true);
     final snapshot = await collectionRef.get();
     final documents = snapshot.docs.map((doc) => doc.data()).toList();
 
     final filteredDocuments = documents.where((doc) {
-      final docUser1Id = doc['user1_id'] as String; // Cast to String
-      final docUser2Id = doc['user2_id'] as String; // Cast to String
+      final docUser1Id = doc['user1_id'] as String;
+      final docUser2Id = doc['user2_id'] as String;
       return docUser1Id == currentUserId || docUser2Id == currentUserId;
     }).toList();
 
     return filteredDocuments;
+  }
+
+  List<String> filterMessageUsers(Map<String, dynamic> doc) {
+    List<String> messageUsers = [];
+
+    if (doc['user1_id'] != currentUser!.uid) {
+      messageUsers.add(doc['user1_name'] ?? ''); // Handle potential null values
+    } else {
+      messageUsers.add(doc['user2_name'] ?? ''); // Handle potential null values
+    }
+
+    return messageUsers;
   }
 
   @override
@@ -129,12 +156,107 @@ class _MessagesThreads extends State<MessagesThreads>
                         : (filteredDocuments!.isEmpty)
                             ? const Center(
                                 child: Text('No matching messages found.'))
-                            : ListView.builder(
+                            : ListView.separated(
+                                separatorBuilder: (context, index) =>
+                                    const SizedBox(height: 10.0),
                                 itemCount: filteredDocuments!.length,
                                 itemBuilder: (context, index) {
                                   final doc = filteredDocuments![index];
-                                  return Text(
-                                    'User ID: ${doc['user1_id'] ?? '---'} OR ${doc['user2_id'] ?? '---'}',
+                                  //
+                                  //DateTime import and parsing
+                                  String formattedTimestamp =
+                                      _formatTimestampForDisplay(
+                                          doc['last_time']);
+                                  //
+                                  //
+                                  final messageUser = filterMessageUsers(doc);
+                                  return Container(
+                                    padding: const EdgeInsets.only(
+                                      top: 7,
+                                      bottom: 7,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(45.0),
+                                      border: Border.all(
+                                          width: 2, color: Colors.black),
+                                    ),
+                                    height: 80,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        SizedBox(
+                                          //Contains User DP
+                                          width: 50,
+                                          child: Container(
+                                            color: Colors.purple,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                          child: Container(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          //Contain Message info
+                                          width: 150,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  messageUser.isEmpty
+                                                      ? '$messageUser'
+                                                      : messageUser.join(' '),
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                height: 13,
+                                                child: Container(
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              Container(
+                                                alignment: Alignment.bottomLeft,
+                                                child: Text(
+                                                  '${doc['last_msg'] ?? '---'}',
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                          child: Container(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          //Contain Message last message time
+                                          width: 50,
+                                          child: Container(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                formattedTimestamp,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              )),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 },
                               ),
