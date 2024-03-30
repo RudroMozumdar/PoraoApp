@@ -17,6 +17,7 @@ dependencies:
   cloud_firestore: ^4.15.9
   firebase_storage: ^11.6.10
   google_nav_bar: ^5.0.6
+  expandable_text: ^2.3.0
   audioplayers: ^5.2.1
   rxdart: ^0.27.7
   intl: ^0.19.0

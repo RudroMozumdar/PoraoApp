@@ -234,8 +234,16 @@ Widget questions(BuildContext context) {
                         fontFamily: primaryFont,
                       ),
                     ),
-                    subtitle: Text(
+                    subtitle: ExpandableText(
                       post['content'],
+                      expandText: 'show more.',
+                      maxLines: 6,
+                      linkColor: Colors.blue,
+                      animation: true,
+                      collapseText: '...show less',
+                      expandOnTextTap: true,
+                      collapseOnTextTap: true,
+                      textAlign: TextAlign.justify,
                       style: TextStyle(
                         fontFamily: primaryFont,
                       ),

@@ -1,5 +1,4 @@
 import 'package:porao_app/common/all_import.dart';
-import 'package:porao_app/firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
