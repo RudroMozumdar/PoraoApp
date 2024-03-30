@@ -237,7 +237,7 @@ Widget questions(BuildContext context) {
                     subtitle: ExpandableText(
                       post['content'],
                       expandText: 'show more.',
-                      maxLines: 6,
+                      maxLines: 5,
                       linkColor: Colors.blue,
                       animation: true,
                       collapseText: '...show less',

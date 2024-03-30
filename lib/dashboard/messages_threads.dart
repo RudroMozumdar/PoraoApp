@@ -57,12 +57,24 @@ class _MessagesThreads extends State<MessagesThreads>
     List<String> messageUsers = [];
 
     if (doc['user1_id'] != currentUser!.uid) {
-      messageUsers.add(doc['user1_name'] ?? ''); // Handle potential null values
+      messageUsers.add(doc['user1_name'] ?? '');
     } else {
-      messageUsers.add(doc['user2_name'] ?? ''); // Handle potential null values
+      messageUsers.add(doc['user2_name'] ?? '');
     }
 
     return messageUsers;
+  }
+
+  List<String> filterUserDpUrl(Map<String, dynamic> data) {
+    List<String> userDP = [];
+
+    if (data['user1_id'] != currentUser!.uid) {
+      userDP.add(data['user1DpUrl'] ?? '');
+    } else {
+      userDP.add(data['user2DpUrl'] ?? '');
+    }
+
+    return userDP;
   }
 
   @override
@@ -171,92 +183,113 @@ class _MessagesThreads extends State<MessagesThreads>
                                   //
                                   //
                                   final messageUser = filterMessageUsers(doc);
-                                  return Container(
-                                    padding: const EdgeInsets.only(
-                                      top: 7,
-                                      bottom: 7,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(45.0),
-                                      border: Border.all(
-                                          width: 2, color: Colors.black),
-                                    ),
-                                    height: 80,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        SizedBox(
-                                          //Contains User DP
-                                          width: 50,
-                                          child: Container(
-                                            color: Colors.purple,
+                                  final userDP = filterUserDpUrl(doc);
+                                  return GestureDetector(
+                                    // onTap: () {
+                                    //   // Navigate to the next page with document data
+                                    //   Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //       builder: (context) =>
+                                    //           const MyPosts(), // Replace with your page class
+                                    //     ),
+                                    //   );
+                                    // },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                        top: 7,
+                                        bottom: 7,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(45.0),
+                                        border: Border.all(
+                                            width: 2, color: Colors.black),
+                                      ),
+                                      height: 80,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          SizedBox(
+                                            //Contains User DP
+                                            width: 50,
+                                            child: CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage: NetworkImage(
+                                                  userDP.isEmpty
+                                                      ? '$userDP'
+                                                      : userDP.join(' ')),
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                          child: Container(
-                                            color: Colors.white,
+                                          SizedBox(
+                                            width: 10,
+                                            child: Container(
+                                              color: Colors.white,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          //Contain Message info
-                                          width: 150,
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                alignment: Alignment.centerLeft,
-                                                child: Text(
-                                                  messageUser.isEmpty
-                                                      ? '$messageUser'
-                                                      : messageUser.join(' '),
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 15,
+                                          SizedBox(
+                                            //Contain Message info
+                                            width: 150,
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  child: Text(
+                                                    messageUser.isEmpty
+                                                        ? '$messageUser'
+                                                        : messageUser.join(' '),
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 15,
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              SizedBox(
-                                                height: 13,
-                                                child: Container(
-                                                  color: Colors.white,
+                                                SizedBox(
+                                                  height: 13,
+                                                  child: Container(
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
-                                              ),
-                                              Container(
-                                                alignment: Alignment.bottomLeft,
+                                                Container(
+                                                  alignment:
+                                                      Alignment.bottomLeft,
+                                                  child: Text(
+                                                    '${doc['last_msg'] ?? '---'}',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w400),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                            child: Container(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            //Contain Message last message time
+                                            width: 50,
+                                            child: Container(
+                                                alignment: Alignment.center,
                                                 child: Text(
-                                                  '${doc['last_msg'] ?? '---'}',
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
+                                                  formattedTimestamp,
                                                   style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              )
-                                            ],
+                                                    fontSize: 12,
+                                                  ),
+                                                )),
                                           ),
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                          child: Container(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          //Contain Message last message time
-                                          width: 50,
-                                          child: Container(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                formattedTimestamp,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                ),
-                                              )),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },
