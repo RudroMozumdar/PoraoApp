@@ -38,8 +38,9 @@ class _MessagesThreads extends State<MessagesThreads>
   Future<List<Map<String, dynamic>>> fetchAndFilterByUserId(
     String currentUserId,
   ) async {
-    final collectionRef = _firestore.collection('messages');
-    collectionRef.orderBy("last_time", descending: true);
+    final collectionRef = _firestore
+        .collection('messages')
+        .orderBy("last_time", descending: true);
     final snapshot = await collectionRef.get();
     final documents = snapshot.docs.map((doc) => doc.data()).toList();
 
