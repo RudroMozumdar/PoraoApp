@@ -153,8 +153,9 @@ class _LoginState extends State<Login> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
-                      onPressed: () {
-                        signInWithEmailAndPassword();
+                      onPressed: () async {
+                        await signInWithEmailAndPassword();
+                        // ignore: use_build_context_synchronously
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const WidgetTree(),

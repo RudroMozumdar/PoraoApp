@@ -7,11 +7,13 @@ class Dashboard extends StatefulWidget {
   State<Dashboard> createState() => _DashboardState();
 }
 
+final PageController pageController = PageController();
+var currentTab = 0;
+
 class _DashboardState extends State<Dashboard> {
-  final PageController _pageController = PageController();
   var tabs = const [
     HomePage(),
-    StudentRequests(),
+    CreatePost(),
     MessagesThreads(),
     MyPosts(),
   ];
@@ -21,7 +23,6 @@ class _DashboardState extends State<Dashboard> {
     "Threads & Messages",
     "My Posts",
   ];
-  var _currentTab = 0;
 
   // Nav Bar -----------------------------------------------------------------------------------------
   Widget _navBar() {
@@ -52,9 +53,9 @@ class _DashboardState extends State<Dashboard> {
               icon: Icons.notifications,
             ),
           ],
-          selectedIndex: _currentTab,
+          selectedIndex: currentTab,
           onTabChange: (tabIndex) {
-            _pageController.animateToPage(
+            pageController.animateToPage(
               tabIndex,
               duration: const Duration(milliseconds: 500),
               curve: Curves.fastEaseInToSlowEaseOut,
@@ -67,7 +68,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void dispose() {
-    _pageController.dispose();
+    pageController.dispose();
     super.dispose();
   }
 
@@ -80,15 +81,15 @@ class _DashboardState extends State<Dashboard> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         // App Bar
-        appBar: CustomAppBar(title: tabNames[_currentTab]),
+        appBar: CustomAppBar(title: tabNames[currentTab]),
 
         // Body
         body: PageView(
-          controller: _pageController,
+          controller: pageController,
           children: tabs,
           onPageChanged: (pageIndex) {
             setState(() {
-              _currentTab = pageIndex;
+              currentTab = pageIndex;
             });
           },
         ),

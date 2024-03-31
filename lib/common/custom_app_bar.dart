@@ -24,7 +24,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: primaryColor,
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(context);
+          currentTab = 0;
+          pageController.animateToPage(
+            currentTab,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.fastEaseInToSlowEaseOut,
+          );
         },
         icon: const Icon(Icons.arrow_back_ios_new_rounded),
       ),
