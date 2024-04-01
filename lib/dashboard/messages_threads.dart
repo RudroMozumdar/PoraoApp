@@ -154,8 +154,8 @@ class _MessagesThreads extends State<MessagesThreads>
             child: TabBar(
               controller: _tabController,
               tabs: const [
-                Tab(text: 'Threads'),
                 Tab(text: 'Messages'),
+                Tab(text: 'Threads'),
               ],
             ),
           ),
@@ -172,17 +172,6 @@ class _MessagesThreads extends State<MessagesThreads>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // Content for THREADS tab
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(45.0),
-                        border: Border.all(width: 2, color: primaryColor)),
-                    child: const Center(
-                      child: Text('Threads Content'),
-                    ),
-                  ),
-
                   // Content for MESSAGES Tab
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -328,6 +317,19 @@ class _MessagesThreads extends State<MessagesThreads>
                                 },
                               ),
                   ),
+                  
+                  // Content for THREADS tab
+                  Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(45.0),
+                        border: Border.all(width: 2, color: primaryColor)),
+                    child: const Center(
+                      child: Text('Threads Content'),
+                    ),
+                  ),
+
+                  
                 ],
               ),
             ),
