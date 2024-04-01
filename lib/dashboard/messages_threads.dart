@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'dart:async';
 import 'package:porao_app/common/all_import.dart';
 
 class MessagesThreads extends StatefulWidget {
@@ -20,6 +21,8 @@ class _MessagesThreads extends State<MessagesThreads>
   List<Map<String, dynamic>>? filteredDocuments; // Initialize as null
 
   var currentUser = FirebaseAuth.instance.currentUser;
+
+  late Timer _refreshTimer;
 
   Future<void> _fetchAndFilterMessages() async {
     filteredDocuments = await fetchAndFilterByUserId(currentUser!.uid);
@@ -42,7 +45,12 @@ class _MessagesThreads extends State<MessagesThreads>
         .collection('messages')
         .orderBy("last_time", descending: true);
     final snapshot = await collectionRef.get();
-    final documents = snapshot.docs.map((doc) => doc.data()).toList();
+    final documents = snapshot.docs.map((doc) {
+      final documentData = doc.data();
+      final documentId = doc.id;
+      documentData['id'] = documentId;
+      return documentData;
+    }).toList();
 
     final filteredDocuments = documents.where((doc) {
       final docUser1Id = doc['user1_id'] as String;
@@ -77,6 +85,19 @@ class _MessagesThreads extends State<MessagesThreads>
     return userDP;
   }
 
+  List<String> filterUserId(Map<String, dynamic> data) {
+    //Lists the ID of the people that are messaged
+    List<String> userID = [];
+
+    if (data['user1_id'] != currentUser!.uid) {
+      userID.add(data['user1_id'] ?? '');
+    } else {
+      userID.add(data['user2_id'] ?? '');
+    }
+
+    return userID;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -88,11 +109,16 @@ class _MessagesThreads extends State<MessagesThreads>
   @override
   void dispose() {
     _tabController.dispose();
+    _refreshTimer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    _refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _fetchAndFilterMessages();
+    });
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
@@ -184,17 +210,24 @@ class _MessagesThreads extends State<MessagesThreads>
                                   //
                                   final messageUser = filterMessageUsers(doc);
                                   final userDP = filterUserDpUrl(doc);
+                                  final userID = filterUserId(doc);
+
                                   return GestureDetector(
-                                    // onTap: () {
-                                    //   // Navigate to the next page with document data
-                                    //   Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //       builder: (context) =>
-                                    //           const MyPosts(), // Replace with your page class
-                                    //     ),
-                                    //   );
-                                    // },
+                                    onTap: () {
+                                      // Navigate to the next page with document data
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatPage(
+                                            docID: doc['id'].toString(),
+                                            userName: messageUser.first,
+                                            userDP: userDP.first,
+                                            userId: userID.first,
+                                            currentUserId: currentUser!.uid,
+                                          ), // Replace with your page class
+                                        ),
+                                      );
+                                    },
                                     child: Container(
                                       padding: const EdgeInsets.only(
                                         top: 7,
