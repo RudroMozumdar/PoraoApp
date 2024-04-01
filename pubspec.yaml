@@ -27,9 +27,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^2.0.0
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/images/logo/logo.jpg"
+  adaptive_icon_background: "assets/images/logo/logo_background.png"
+  adaptive_icon_foreground: "assets/images/logo/logo_foreground.png"
 
 flutter:
   uses-material-design: true
@@ -37,6 +42,7 @@ flutter:
   assets:
     - assets/images/backgrounds/
     - assets/images/
+    - assets/images/logo/
     - assets/audios/
 
   # To add custom fonts to your application, add a fonts section here,

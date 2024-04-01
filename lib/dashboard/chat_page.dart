@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-import 'dart:async';
 import 'package:porao_app/common/all_import.dart';
 
 class ChatPage extends StatefulWidget {
@@ -56,8 +54,8 @@ class _ChatPage extends State<ChatPage> {
               backgroundImage: NetworkImage(widget.userDP),
             ),
             Text(
-              "  " + widget.userName,
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+              "  ${widget.userName}",
+              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -128,7 +126,7 @@ class _ChatPage extends State<ChatPage> {
         mainAxisAlignment: mainAxisAlignment,
         children: [
           if (!isSender)
-            SizedBox(width: 10), // Add some space for non-sender messages
+            const SizedBox(width: 10), // Add some space for non-sender messages
           Container(
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
@@ -138,11 +136,11 @@ class _ChatPage extends State<ChatPage> {
             child: Text(
               message['content'] ?? ' ',
               textAlign: textAlign,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           if (isSender)
-            SizedBox(width: 10), // Add some space for sender messages
+            const SizedBox(width: 10), // Add some space for sender messages
         ],
       ),
     );

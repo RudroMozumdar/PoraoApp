@@ -6,6 +6,7 @@ export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutter/material.dart';
 export 'package:google_nav_bar/google_nav_bar.dart';
 export 'package:expandable_text/expandable_text.dart';
+export 'dart:async';
 
 // Pages Import
 export 'package:porao_app/auth/auth.dart';
