@@ -1,3 +1,16 @@
-{
-    "cmake.sourceDirectory": "D:/Study/THIS SEMESTER/CSE499A/PoraoApp/PoraoApp/build/windows/x64/extracted/firebase_cpp_sdk"
+
+{"[dart]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.rulers": [
+        80
+    ],
+    "editor.selectionHighlight": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off",
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    }
+}
 }
