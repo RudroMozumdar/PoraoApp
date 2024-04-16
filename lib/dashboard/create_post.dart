@@ -1,5 +1,4 @@
 import 'package:porao_app/common/all_import.dart';
-import 'package:porao_app/common/fonts.dart';
 
 class CreatePost extends StatefulWidget {
   const CreatePost({super.key});

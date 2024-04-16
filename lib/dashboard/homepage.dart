@@ -325,23 +325,34 @@ class _HomePageState extends State<HomePage> {
                             color: vote == -1 ? Colors.white : Colors.black,
                           ),
                         ),
-                      ],
+                      ],                      
                     ),
                     Row(
                       children: [
                         IconButton(
                           onPressed: () {
                             // Get the question data (replace with your actual way of accessing data)
-                            final String title = post['title'];
+                            final String docID = post.id;
+                            final String authorName = post['authorName'];
+                            final String authorID = post['authorId'];
                             final String content = post['content'];
+                            final String title = post['title'];
+                            final String privacy = post['privacy'];
+                            final timestamp = post['createdAt'] as Timestamp;
 
                             // Navigate to the AnswerPage with data
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => AnswerPage(
+                                    postID: docID,
+                                    authorName: authorName,
+                                    authorID: authorID,
+                                    questionContent: content,
                                     questionTitle: title,
-                                    questionContent: content),
+                                    privacyType: privacy,
+                                    postTimestamp: timestamp,
+                                ),                                    
                               ),
                             );
                           },
