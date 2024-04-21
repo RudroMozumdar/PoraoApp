@@ -27,6 +27,7 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
+            
             Column(
               children: [
                 const SizedBox(height: 125),

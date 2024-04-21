@@ -32,8 +32,7 @@ class AnswerPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.only(
               bottom: 16.0), // Remove default padding if any
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
+          child: Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -294,13 +293,6 @@ class AnswerPage extends StatelessWidget {
                             ),
                           );
                         }
-                    
-                        //.............IF ANSWERS ARE PRESENT, IT IS VIEWED HERE...........//
-                        // return ListView.builder(
-                        //   itemCount: 1,
-                        //   itemBuilder: (context, index) => Text(documents[index].id),
-                          
-                        // );
             
                         return StreamBuilder<QuerySnapshot>(
                             stream: FirebaseFirestore.instance
@@ -319,104 +311,198 @@ class AnswerPage extends StatelessWidget {
                                   return const Center(child: CircularProgressIndicator());
                                 default:
                                   final documents = snapshot.data!.docs;
-                                  return Expanded(
-                                    child: ListView.builder(
-                                      itemCount: documents.length,
-                                      itemBuilder: (context, index) {
-                                        final data = documents[index].data()! as Map<String, dynamic>;
-                                        final String content = data['content'];
-                                        final String dpURL = data['dp-url'];
-                                        final String author = data['authorName'];
-                                        final timeOfCreation = data['createdAt'] as Timestamp;
-                                        // ... Access and display other relevant data from the document
-                                                            
-                                        return Container(
-                                              width: double.infinity,
-                                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                                              decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(10),
-                                                  ),
-                                                color: Colors.white,
-                                              ),
-                                      
-                                              child: Column(
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 25,
-                                                        backgroundImage: NetworkImage(dpURL),
-                                                      ),
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: documents.length,
+                                    itemBuilder: (context, index) {
+                                      final data = documents[index].data()! as Map<String, dynamic>;
+                                      final String content = data['content'];
+                                      final String dpURL = data['dp-url'];
+                                      final String author = data['authorName'];
+                                      final timeOfCreation = data['createdAt'] as Timestamp;
+                                      // ... Access and display other relevant data from the document
+                                                          
+                                      return Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                            margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                            decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                Radius.circular(10),
+                                                ),
+                                              color: Colors.white,
+                                            ),
+                                    
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 20,
+                                                      backgroundImage: NetworkImage(dpURL),
+                                                    ),
 
-                                                      Container(
-                                                        width: 15,
-                                                      ),
+                                                    Container(
+                                                      width: 10,
+                                                    ),
 
-                                                      Text(
-                                                        author,
-                                                        style: const TextStyle(
-                                                          fontSize: 18.5,
-                                                          fontWeight: FontWeight.bold,
+                                                    Text(
+                                                      author,
+                                                      style: const TextStyle(
+                                                        fontSize: 18.5,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+
+                                                    Container(
+                                                      width: 15,
+                                                    ),
+
+                                                    Text(
+                                                      formatTimeDifference(DateTime.now()
+                                                          .difference(timeOfCreation.toDate())),
+                                                      style: TextStyle(
+                                                        fontFamily: primaryFont, 
+                                                        color: Colors.black, 
+                                                        fontSize: 13
                                                         ),
-                                                        textAlign: TextAlign.center,
-                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
 
-                                                      Container(
-                                                        width: 15,
-                                                      ),
+                                                Container(
+                                                  height: 5,
+                                                  alignment: Alignment.bottomLeft,
+                                                ),
 
-                                                      Text(
-                                                        formatTimeDifference(DateTime.now()
-                                                            .difference(timeOfCreation.toDate())),
-                                                        style: TextStyle(
-                                                          fontFamily: primaryFont, 
-                                                          color: Colors.black, 
-                                                          fontSize: 15
-                                                          ),
-                                                      ),
-                                                    ],
-                                                  ),
-
-                                                  Text(
+                                                Container(
+                                                  child: Text(
                                                     content,
                                                     style: const TextStyle(
                                                       fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight: FontWeight.normal,
                                                     ),
                                                     textAlign: TextAlign.justify,
                                                   ),
-                                                ],
-                                              ),
-                                            );
+                                                  alignment: Alignment.bottomLeft,
+                                                ),
+
+                                                //...............THE REACTION BUTTONS FOR REPLY COMMENTS............//
+                                                Row(             
+                                                  mainAxisAlignment: MainAxisAlignment.end,                                     
+                                                  children: [
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        final commentController = TextEditingController();
+
+                                                        FocusNode commentFocusNode = FocusNode();
+
+                                                        showModalBottomSheet<void>(
+                                                          isScrollControlled: true,
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+                                                            return SingleChildScrollView(
+                                                              child: Container(
+                                                                padding: EdgeInsets.only(bottom: keyboardHeight),
+                                                                height: 80,
+                                                                child: Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: TextField(
+                                                                        controller: commentController,
+                                                                        focusNode: commentFocusNode, 
+                                                                        decoration: const InputDecoration(
+                                                                          hintText: 'Enter your comment...',
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    IconButton(
+                                                                      onPressed: () async {
+                                                                        final firestore = FirebaseFirestore.instance;
+                                                                        final commentContent = commentController.text;
+                                                                        String? name;
+                                                                        String? imageUrl;
+                                                                        String currentUser = FirebaseAuth.instance.currentUser!.uid;
+                                                                                                        
+                                                                        try {
+                                                                          final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                                                                              .collection('users')
+                                                                              .doc(currentUser)
+                                                                              .get();
+                                                                                                        
+                                                                          if (documentSnapshot.exists) {
+                                                                            final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
+                                                                            name = data['name'];
+                                                                            imageUrl = data['dp-url'];
+                                                                          } else {
+                                                                            print('Document does not exist');
+                                                                          }
+                                                                                                        
+                                                                          await firestore
+                                                                              .collection('posts')
+                                                                              .doc(postID)
+                                                                              .collection('answers')
+                                                                              .doc()
+                                                                              .set({
+                                                                                'content': commentContent,
+                                                                                'createdAt': FieldValue.serverTimestamp(),
+                                                                                'authorID': FirebaseAuth.instance.currentUser!.uid,
+                                                                                'authorName': name,
+                                                                                'dp-url': imageUrl,
+                                                                                'level': 0,
+                                                                                'parent': "",
+                                                                                'upvotes': [],
+                                                                                'downvotes': [],
+                                                                                'totalReplies': 0,
+                                                                              });
+                                                                          commentController.clear();
+                                                                        } catch (error) {
+                                                                          print('Error sending message: $error');
+                                                                        }
+                                                                      },
+                                                                      icon: const Icon(Icons.send),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                        ).then((_) {
+                                                          // Request focus after showModalBottomSheet opens
+                                                          commentFocusNode.requestFocus();
+                                                        });
+                                                      },
+                                                      icon: const Icon(Icons.comment, color: Colors.grey),
+                                                    ),
+                                        
+                                                    IconButton(
+                                                      onPressed: () {},
+                                                      icon: const Icon(Icons.arrow_upward_rounded, color: Colors.grey,),
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {}, 
+                                                      icon: const Icon(Icons.arrow_downward_rounded, color: Colors.grey,),
+                                                    ),
+                                                    IconButton(
+                                                      onPressed: () {},
+                                                      icon: const Icon(Icons.share, color: Colors.grey,),
+                                                    ),
+                                                  ],
+                                                ),
+
+                                                //........REPLY TO A PARTICULAR COMMENT..........//
+                                              ],
+                                            ),
+                                          );
                                       },
-                                    ),
                                   );
                               }
                             },
-                          );
-            
-                        // return Container(
-                        //   width: double.infinity,
-                        //   padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                        //   margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        //   decoration: const BoxDecoration(
-                        //     borderRadius: BorderRadius.all(
-                        //       Radius.circular(10),
-                        //       ),
-                        //     color: Colors.white,
-                        //   ),
-                  
-                        //   child: Text(
-                        //     "This is a really tough",
-                        //     style: const TextStyle(
-                        //       fontSize: 15,
-                        //       fontWeight: FontWeight.bold,
-                        //     ),
-                        //     textAlign: TextAlign.justify,
-                        //   ),
-                        // );
+                          );            
                     }
                   }
                 )
