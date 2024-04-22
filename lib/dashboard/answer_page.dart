@@ -10,153 +10,152 @@ class AnswerPage extends StatelessWidget {
   final String privacyType;
   final Timestamp postTimestamp;
 
-
-  const AnswerPage(
-    {
-      super.key, 
-      required this.postID,
-      required this.authorName,
-      required this.authorID,
-      required this.questionContent,
-      required this.questionTitle,
-      required this.privacyType,
-      required this.postTimestamp,
-    }
-  );
-
+  const AnswerPage({
+    super.key,
+    required this.postID,
+    required this.authorName,
+    required this.authorID,
+    required this.questionContent,
+    required this.questionTitle,
+    required this.privacyType,
+    required this.postTimestamp,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-              bottom: 16.0), // Remove default padding if any
-          child: Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //...........................COLUMN CHILDRENS................//
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.only(top: 60, bottom: 20),
-                  color: primaryColor,
-                  child: Row(
-                    children: [
-                      IconButton(icon: const Icon(Icons.arrow_back_ios_new, size: 35, color: Colors.white,),
-                        onPressed: () => Navigator.pop(context),                    
-                      ),
-                    
-                      const Text(
-                        "POSTED BY",
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Color.fromARGB(255, 214, 214, 214)
-                        ),
-                      ),
-                    
-                      IconButton(
-                        onPressed: (){}, 
-                        icon: Flexible(
-                          child: Text(authorName,
-                          style: const TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(
+                bottom: 16.0), // Remove default padding if any
+            child: Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //...........................COLUMN CHILDRENS................//
+                  Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.only(top: 60, bottom: 20),
+                      color: primaryColor,
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              size: 35,
+                              color: Colors.white,
+                            ),
+                            onPressed: () => Navigator.pop(context),
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          const Text(
+                            "POSTED BY",
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Color.fromARGB(255, 214, 214, 214)),
                           ),
-                        ),
-                      ),
-                    
-                      const Text('. ',
-                          style: TextStyle(
-                            fontSize: 25,
-                            color: Colors.white,
-                          ),),
-                    
-                      Text(
-                        formatTimeDifference(DateTime.now()
-                            .difference(postTimestamp.toDate())),
-                        style: TextStyle(
-                          fontFamily: primaryFont, 
-                          color: Colors.white, 
-                          fontSize: Checkbox.width
+                          IconButton(
+                            onPressed: () {},
+                            icon: Flexible(
+                              child: Text(
+                                authorName,
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                           ),
+                          const Text(
+                            '. ',
+                            style: TextStyle(
+                              fontSize: 25,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            formatTimeDifference(DateTime.now()
+                                .difference(postTimestamp.toDate())),
+                            style: TextStyle(
+                                fontFamily: primaryFont,
+                                color: Colors.white,
+                                fontSize: Checkbox.width),
+                          ),
+                        ],
+                      )),
+
+                  //const SizedBox(height: 10),
+
+                  Container(
+                    //........QUESTION TITLE.......//
+
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
                       ),
-                    ],
-                  )
-                ),
-                            
-                //const SizedBox(height: 10),
-            
-                Container(    //........QUESTION TITLE.......//
-                  
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10), 
-                      topRight: Radius.circular(10),
-                      ),                
                       color: Colors.white,
-                  ),
-                    
-                  child: Text(
-                    questionTitle,
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,                  
                     ),
-                    textAlign: TextAlign.justify,
-                  ),
-                ),
-                    
-                Container(    //........QUESTION CONTENT.......//
-                  
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10), 
-                      bottomRight: Radius.circular(10),
+
+                    child: Text(
+                      questionTitle,
+                      style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
                       ),
-                    color: Colors.white,
-                  ),
-                    
-                  child: Text(
-                    questionContent,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      textAlign: TextAlign.justify,
                     ),
-                    textAlign: TextAlign.justify,
                   ),
-                ),
-                    
-                    
-                Container(    //........... COMMENT, UPVOTE, DOWNVOTE, SHARE .........//
-                  width: double.infinity,
-                  margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+
+                  Container(
+                    //........QUESTION CONTENT.......//
+
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      color: Colors.white,
+                    ),
+
+                    child: Text(
+                      questionContent,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+
+                  Container(
+                    //...........MAIN COMMENT, UPVOTE, DOWNVOTE, SHARE .........//
+                    width: double.infinity,
+                    margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     decoration: BoxDecoration(
                       color: primaryColor, // Adjust the color as needed
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    // padding: EdgeInsets.zero,
+                    
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-            
-                        IconButton(
+
+                        IconButton( //..........Comment Button .............//
                           onPressed: () {
-                            final commentController = TextEditingController(); // Create controller here
-            
+                            final commentController = TextEditingController();
+
                             showModalBottomSheet<void>(
                               context: context,
                               builder: (BuildContext context) {
                                 final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-            
+
                                 return Container(
                                   padding: EdgeInsets.only(
                                     top: 10,
@@ -165,31 +164,33 @@ class AnswerPage extends StatelessWidget {
                                     bottom: keyboardHeight,
                                   ),
                                   height: 80,
+
                                   child: Row(
                                     children: [
+
                                       Expanded(
                                         child: TextField(
-                                          controller: commentController, // Add controller here
+                                          controller: commentController,
                                           decoration: const InputDecoration(
                                             hintText: 'Enter your comment...',
                                           ),
                                         ),
                                       ),
-            
-                                      IconButton(
-                                        onPressed: () async { // Make onPressed async
+
+                                      IconButton(  //.............Send Button For Comment...........//
+                                        onPressed: () async {
                                           final firestore = FirebaseFirestore.instance;
                                           final commentContent = commentController.text;
                                           String? name;
                                           String? imageUrl;
                                           String currentUser = FirebaseAuth.instance.currentUser!.uid;
-            
+
                                           try {
                                             final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-                                                .collection('users')
-                                                .doc(currentUser)
-                                                .get();
-            
+                                            .collection('users')
+                                            .doc(currentUser)
+                                            .get();
+
                                             if (documentSnapshot.exists) {
                                               final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
                                               name = data['name'];
@@ -197,7 +198,7 @@ class AnswerPage extends StatelessWidget {
                                             } else {
                                               print('Document does not exist');
                                             }
-            
+
                                             await firestore
                                                 .collection('posts')
                                                 .doc(postID)
@@ -214,15 +215,16 @@ class AnswerPage extends StatelessWidget {
                                                   'upvotes': [],
                                                   'downvotes': [],
                                                   'totalReplies': 0,
-                                                });
+                                                },
+                                            );
                                             commentController.clear();
                                           } catch (error) {
-                                            print('Error sending message: $error');
+                                            print(
+                                                'Error sending message: $error');
                                           }
                                         },
                                         icon: const Icon(Icons.send),
                                       ),
-            
                                     ],
                                   ),
                                 );
@@ -231,289 +233,336 @@ class AnswerPage extends StatelessWidget {
                           },
                           icon: const Icon(Icons.comment, color: Colors.white),
                         ),
-            
+
                         IconButton(
                           onPressed: () {},
-                          icon: const Icon(Icons.arrow_upward_rounded, color: Colors.white,),
+                          icon: const Icon(
+                            Icons.arrow_upward_rounded,
+                            color: Colors.white,
+                          ),
                         ),
-                        IconButton(
-                          onPressed: () {}, 
-                          icon: const Icon(Icons.arrow_downward_rounded, color: Colors.white,),
-                        ),
+
                         IconButton(
                           onPressed: () {},
-                          icon: const Icon(Icons.share, color: Colors.white,),
+                          icon: const Icon(
+                            Icons.arrow_downward_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.share,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
+                    ),
                   ),
-                ),
-                    
-                //..................Checks for Replies/Answers and then pastes (if any)...........//
-                StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection('posts') // Replace with your collection name
-                      .doc(postID) // Replace with your document ID
-                      .collection('answers')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-                    
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const Center(child: CircularProgressIndicator());
-                      default:
-                        final documents = snapshot.data!.docs;
-                        if (documents.isEmpty) {
-                          return Center(
-                    
-                            child: Container(
-                              width: double.infinity,
-                              height: 150,
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                              margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(10),
-                                  ),
-                                color: Colors.white,
-                              ),
-                    
-                              child: const Center(
-                                child: Text(
-                                  "No Answers Yet!",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          );
+
+                  //..................Checks for Replies/Answers and then pastes (if any)...........//
+                  StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('posts')
+                          .doc(postID)
+                          .collection('answers')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
                         }
-            
-                        return StreamBuilder<QuerySnapshot>(
-                            stream: FirebaseFirestore.instance
-                                .collection('posts')
-                                .doc(postID)
-                                .collection('answers')
-                                .where('level', isEqualTo: 0)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              }
-                          
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return const Center(child: CircularProgressIndicator());
-                                default:
-                                  final documents = snapshot.data!.docs;
-                                  return ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: documents.length,
-                                    itemBuilder: (context, index) {
-                                      final data = documents[index].data()! as Map<String, dynamic>;
-                                      final String content = data['content'];
-                                      final String dpURL = data['dp-url'];
-                                      final String author = data['authorName'];
-                                      final timeOfCreation = data['createdAt'] as Timestamp;
-                                      // ... Access and display other relevant data from the document
-                                                          
-                                      return Container(
-                                            width: double.infinity,
-                                            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                            margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                                            decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(10),
-                                                ),
-                                              color: Colors.white,
+
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          default:              //................IF NO THREADS ARE FOUND ............//
+                            final documents = snapshot.data!.docs;
+                            if (documents.isEmpty) {
+                              return Center(
+                                child: Container(
+                                  width: double.infinity,
+                                  height: 150,
+                                  padding:
+                                      const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                  margin:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
+                                    ),
+                                    color: Colors.white,
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "No Answers Yet!",
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+
+                            return StreamBuilder<QuerySnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('posts')
+                                  .doc(postID)
+                                  .collection('answers')
+                                  .where('level', isEqualTo: 0)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                }
+
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.waiting:
+                                    return const Center(
+                                      child: CircularProgressIndicator());
+                                  default:
+                                    final documents = snapshot.data!.docs;
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                        const NeverScrollableScrollPhysics(),
+                                      itemCount: documents.length,
+                                      itemBuilder: (context, index) {
+                                        final data = documents[index].data()! as Map<String, dynamic>;
+                                        DocumentSnapshot comment = documents[index];
+                                        final curDocID = comment.id;
+                                        final String content = data['content'];
+                                        final String dpURL = data['dp-url'];
+                                        final String author = data['authorName'];
+                                        final timeOfCreation = data['createdAt'] as Timestamp;
+
+                                        return Container(  //............CONTAINS INDIVIDUAL REPLIES........//
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                                          margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                          decoration: const BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                              Radius.circular(10),
                                             ),
-                                    
-                                            child: Column(
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    CircleAvatar(
-                                                      radius: 20,
-                                                      backgroundImage: NetworkImage(dpURL),
-                                                    ),
-
-                                                    Container(
-                                                      width: 10,
-                                                    ),
-
-                                                    Text(
-                                                      author,
-                                                      style: const TextStyle(
-                                                        fontSize: 18.5,
-                                                        fontWeight: FontWeight.bold,
-                                                      ),
-                                                      textAlign: TextAlign.center,
-                                                    ),
-
-                                                    Container(
-                                                      width: 15,
-                                                    ),
-
-                                                    Text(
-                                                      formatTimeDifference(DateTime.now()
-                                                          .difference(timeOfCreation.toDate())),
-                                                      style: TextStyle(
-                                                        fontFamily: primaryFont, 
-                                                        color: Colors.black, 
-                                                        fontSize: 13
-                                                        ),
-                                                    ),
-                                                  ],
-                                                ),
-
-                                                Container(
-                                                  height: 5,
-                                                  alignment: Alignment.bottomLeft,
-                                                ),
-
-                                                Container(
-                                                  child: Text(
-                                                    content,
-                                                    style: const TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.normal,
-                                                    ),
-                                                    textAlign: TextAlign.justify,
+                                            color: Colors.white,
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  CircleAvatar(  //............ DISPLAY PICTURE..........//
+                                                    radius: 20,
+                                                    backgroundImage:
+                                                        NetworkImage(dpURL),
                                                   ),
-                                                  alignment: Alignment.bottomLeft,
+
+                                                  Container(  
+                                                    width: 10,
+                                                  ),
+
+                                                  Text(  //.................... NAME OF AUTHOR ........//
+                                                    author,
+                                                    style: const TextStyle(
+                                                      fontSize: 18.5,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+
+                                                  Container(
+                                                    width: 15,
+                                                  ),
+
+                                                  Text(
+                                                    formatTimeDifference(
+                                                        DateTime.now()
+                                                            .difference(
+                                                                timeOfCreation
+                                                                    .toDate())),
+                                                    style: TextStyle(
+                                                        fontFamily: primaryFont,
+                                                        color: Colors.black,
+                                                        fontSize: 13),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              Container(
+                                                height: 5,
+                                                alignment: Alignment.bottomLeft,
+                                              ),
+
+                                              Container(  //............... CONTENT OF THE REPLY............//
+                                                alignment: Alignment.bottomLeft,
+                                                child: Text(
+                                                  content,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                  ),
+                                                  textAlign: TextAlign.justify,
                                                 ),
+                                              ),
 
-                                                //...............THE REACTION BUTTONS FOR REPLY COMMENTS............//
-                                                Row(             
-                                                  mainAxisAlignment: MainAxisAlignment.end,                                     
-                                                  children: [
-                                                    IconButton(
-                                                      onPressed: () {
-                                                        final commentController = TextEditingController();
+                                              //............... REACTION BUTTONS FOR REPLY COMMENTS............//
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
 
-                                                        FocusNode commentFocusNode = FocusNode();
-
-                                                        showModalBottomSheet<void>(
-                                                          isScrollControlled: true,
-                                                          context: context,
-                                                          builder: (BuildContext context) {
-                                                            final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-
-                                                            return SingleChildScrollView(
-                                                              child: Container(
-                                                                padding: EdgeInsets.only(bottom: keyboardHeight),
-                                                                height: 80,
-                                                                child: Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: TextField(
-                                                                        controller: commentController,
-                                                                        focusNode: commentFocusNode, 
-                                                                        decoration: const InputDecoration(
-                                                                          hintText: 'Enter your comment...',
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                    IconButton(
-                                                                      onPressed: () async {
-                                                                        final firestore = FirebaseFirestore.instance;
-                                                                        final commentContent = commentController.text;
-                                                                        String? name;
-                                                                        String? imageUrl;
-                                                                        String currentUser = FirebaseAuth.instance.currentUser!.uid;
-                                                                                                        
-                                                                        try {
-                                                                          final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-                                                                              .collection('users')
-                                                                              .doc(currentUser)
-                                                                              .get();
-                                                                                                        
-                                                                          if (documentSnapshot.exists) {
-                                                                            final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
-                                                                            name = data['name'];
-                                                                            imageUrl = data['dp-url'];
-                                                                          } else {
-                                                                            print('Document does not exist');
-                                                                          }
-                                                                                                        
-                                                                          await firestore
-                                                                              .collection('posts')
-                                                                              .doc(postID)
-                                                                              .collection('answers')
-                                                                              .doc()
-                                                                              .set({
-                                                                                'content': commentContent,
-                                                                                'createdAt': FieldValue.serverTimestamp(),
-                                                                                'authorID': FirebaseAuth.instance.currentUser!.uid,
-                                                                                'authorName': name,
-                                                                                'dp-url': imageUrl,
-                                                                                'level': 0,
-                                                                                'parent': "",
-                                                                                'upvotes': [],
-                                                                                'downvotes': [],
-                                                                                'totalReplies': 0,
-                                                                              });
-                                                                          commentController.clear();
-                                                                        } catch (error) {
-                                                                          print('Error sending message: $error');
-                                                                        }
-                                                                      },
-                                                                      icon: const Icon(Icons.send),
-                                                                    ),
-                                                                  ],
-                                                                ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      final commentController = TextEditingController();
+                                                      showModalBottomSheet<void>(
+                                                        context: context,
+                                                        isScrollControlled: true,
+                                                        builder: (context) => Padding(
+                                                          padding: EdgeInsets.only(
+                                                            top: 20.0,
+                                                            right: 20.0,
+                                                            left: 20.0,
+                                                            bottom: MediaQuery.of(context).viewInsets.bottom,
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              TextField(
+                                                                decoration: const InputDecoration(hintText: 'Type reply here'),
+                                                                controller: commentController,
+                                                                autofocus: true,
+                                                                onSubmitted: (text) {
+                                                                  print("Reply: $text");
+                                                                },
                                                               ),
-                                                            );
-                                                          },
-                                                        ).then((_) {
-                                                          // Request focus after showModalBottomSheet opens
-                                                          commentFocusNode.requestFocus();
-                                                        });
-                                                      },
-                                                      icon: const Icon(Icons.comment, color: Colors.grey),
-                                                    ),
-                                        
-                                                    IconButton(
-                                                      onPressed: () {},
-                                                      icon: const Icon(Icons.arrow_upward_rounded, color: Colors.grey,),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {}, 
-                                                      icon: const Icon(Icons.arrow_downward_rounded, color: Colors.grey,),
-                                                    ),
-                                                    IconButton(
-                                                      onPressed: () {},
-                                                      icon: const Icon(Icons.share, color: Colors.grey,),
-                                                    ),
-                                                  ],
-                                                ),
 
-                                                //........REPLY TO A PARTICULAR COMMENT..........//
-                                              ],
-                                            ),
-                                          );
+                                                              IconButton(
+                                                                onPressed: () async {
+                                                                  final firestore = FirebaseFirestore.instance;
+                                                                  final replyContent = commentController.text;
+                                                                  String? name;
+                                                                  String? imageUrl;
+                                                                  String currentUser = FirebaseAuth.instance.currentUser!.uid;
+
+                                                                  try {
+                                                                    final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                                                                    .collection('users')
+                                                                    .doc(currentUser)
+                                                                    .get();
+
+                                                                    if (documentSnapshot.exists) {
+                                                                      final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
+                                                                      name = data['name'];
+                                                                      imageUrl = data['dp-url'];
+                                                                    } else {
+                                                                      print('Document does not exist');
+                                                                    }
+
+                                                                    int? level;
+
+                                                                    try {
+                                                                      final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                                                                        .collection('posts')
+                                                                        .doc(postID)
+                                                                        .collection('answers')
+                                                                        .doc(curDocID)
+                                                                        .get();
+
+                                                                        final Map<String, dynamic> subData = documentSnapshot.data()! as Map<String, dynamic>;
+                                                                        level = subData['level'];
+
+                                                                    } catch(error) {
+                                                                        print(
+                                                                          'Error sending message: $error');
+                                                                    }
+
+                                                                    final newLevel = level! + 1;
+
+                                                                    await firestore
+                                                                        .collection('posts')
+                                                                        .doc(postID)
+                                                                        .collection('answers')
+                                                                        .doc()
+                                                                        .set({
+                                                                          'content': replyContent,
+                                                                          'createdAt': FieldValue.serverTimestamp(),
+                                                                          'authorID': FirebaseAuth.instance.currentUser!.uid,
+                                                                          'authorName': name,
+                                                                          'dp-url': imageUrl,
+                                                                          'level': newLevel,
+                                                                          'parent': curDocID,
+                                                                          'upvotes': [],
+                                                                          'downvotes': [],
+                                                                          'totalReplies': 0,
+                                                                        },
+                                                                    );
+                                                                    commentController.clear();
+                                                                  } catch (error) {
+                                                                    print(
+                                                                        'Error sending message: $error');
+                                                                  }
+                                                                },
+                                                                icon: const Text('Send'),
+                                                              ),                                                                
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    icon: const Icon(Icons.comment, color: Colors.grey),
+                                                  ),
+
+
+                                                  IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                      Icons.arrow_upward_rounded,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                      Icons.arrow_downward_rounded,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {},
+                                                    icon: const Icon(
+                                                      Icons.share,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              //........REPLY TO A PARTICULAR COMMENT..........//
+                                            ],
+                                          ),
+                                        );
                                       },
-                                  );
-                              }
-                            },
-                          );            
-                    }
-                  }
-                )
-              ],
+                                    );
+                                }
+                              },
+                            );
+                        }
+                      })
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      backgroundColor: const Color.fromARGB(255, 240, 240, 240)
-    );
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240));
   }
+
 }
 
 class AnswerSection extends StatefulWidget {
@@ -533,8 +582,7 @@ class _AnswerSection extends State<AnswerSection> {
       child: Column(
         children: [
           StreamBuilder<QuerySnapshot>(
-            stream:
-                FirebaseFirestore.instance.collection('posts').snapshots(),
+            stream: FirebaseFirestore.instance.collection('posts').snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
                 return const Center(
