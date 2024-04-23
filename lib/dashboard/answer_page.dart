@@ -335,7 +335,7 @@ class AnswerPage extends StatelessWidget {
                                       itemBuilder: (context, index) {
                                         final data = documents[index].data()! as Map<String, dynamic>;
                                         DocumentSnapshot comment = documents[index];
-                                        final curDocID = comment.id;
+                                        String curDocID = comment.id;
                                         final String content = data['content'];
                                         final String dpURL = data['dp-url'];
                                         final String author = data['authorName'];
@@ -412,139 +412,34 @@ class AnswerPage extends StatelessWidget {
                                               ),
 
                                               //............... REACTION BUTTONS FOR REPLY COMMENTS............//
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-
-                                                  IconButton(
-                                                    onPressed: () {
-                                                      final commentController = TextEditingController();
-                                                      showModalBottomSheet<void>(
-                                                        context: context,
-                                                        isScrollControlled: true,
-                                                        builder: (context) => Padding(
-                                                          padding: EdgeInsets.only(
-                                                            top: 20.0,
-                                                            right: 20.0,
-                                                            left: 20.0,
-                                                            bottom: MediaQuery.of(context).viewInsets.bottom,
-                                                          ),
-                                                          child: Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: [
-                                                              TextField(
-                                                                decoration: const InputDecoration(hintText: 'Type reply here'),
-                                                                controller: commentController,
-                                                                autofocus: true,
-                                                                onSubmitted: (text) {
-                                                                  print("Reply: $text");
-                                                                },
-                                                              ),
-
-                                                              IconButton(
-                                                                onPressed: () async {
-                                                                  final firestore = FirebaseFirestore.instance;
-                                                                  final replyContent = commentController.text;
-                                                                  String? name;
-                                                                  String? imageUrl;
-                                                                  String currentUser = FirebaseAuth.instance.currentUser!.uid;
-
-                                                                  try {
-                                                                    final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-                                                                    .collection('users')
-                                                                    .doc(currentUser)
-                                                                    .get();
-
-                                                                    if (documentSnapshot.exists) {
-                                                                      final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
-                                                                      name = data['name'];
-                                                                      imageUrl = data['dp-url'];
-                                                                    } else {
-                                                                      print('Document does not exist');
-                                                                    }
-
-                                                                    int? level;
-
-                                                                    try {
-                                                                      final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-                                                                        .collection('posts')
-                                                                        .doc(postID)
-                                                                        .collection('answers')
-                                                                        .doc(curDocID)
-                                                                        .get();
-
-                                                                        final Map<String, dynamic> subData = documentSnapshot.data()! as Map<String, dynamic>;
-                                                                        level = subData['level'];
-
-                                                                    } catch(error) {
-                                                                        print(
-                                                                          'Error sending message: $error');
-                                                                    }
-
-                                                                    final newLevel = level! + 1;
-
-                                                                    await firestore
-                                                                        .collection('posts')
-                                                                        .doc(postID)
-                                                                        .collection('answers')
-                                                                        .doc()
-                                                                        .set({
-                                                                          'content': replyContent,
-                                                                          'createdAt': FieldValue.serverTimestamp(),
-                                                                          'authorID': FirebaseAuth.instance.currentUser!.uid,
-                                                                          'authorName': name,
-                                                                          'dp-url': imageUrl,
-                                                                          'level': newLevel,
-                                                                          'parent': curDocID,
-                                                                          'upvotes': [],
-                                                                          'downvotes': [],
-                                                                          'totalReplies': 0,
-                                                                        },
-                                                                    );
-                                                                    commentController.clear();
-                                                                  } catch (error) {
-                                                                    print(
-                                                                        'Error sending message: $error');
-                                                                  }
-                                                                },
-                                                                icon: const Text('Send'),
-                                                              ),                                                                
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                                    icon: const Icon(Icons.comment, color: Colors.grey),
-                                                  ),
-
-
-                                                  IconButton(
-                                                    onPressed: () {},
-                                                    icon: const Icon(
-                                                      Icons.arrow_upward_rounded,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {},
-                                                    icon: const Icon(
-                                                      Icons.arrow_downward_rounded,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                  IconButton(
-                                                    onPressed: () {},
-                                                    icon: const Icon(
-                                                      Icons.share,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-
+                                              replyButtons(context, curDocID),
+                                              
                                               //........REPLY TO A PARTICULAR COMMENT..........//
+                                              Stream<QuerySnapshot> querySnapshotStream;
+
+                                              for (int i = 1; i < 15; i++) { // Assuming loop iterates from 1 to 14
+                                                querySnapshotStream = FirebaseFirestore.instance
+                                                    .collection('posts')
+                                                    .doc(postID)
+                                                    .collection('answers')
+                                                    .where('level', isEqualTo: i)
+                                                    .snapshots();
+
+                                                // Handle the stream of QuerySnapshots for each level
+                                                querySnapshotStream.listen((snapshot) {
+                                                  if (snapshot.docs.isNotEmpty) {
+                                                    // Process documents at the current level 'i'
+                                                    for (final DocumentSnapshot doc in snapshot.docs) {
+                                                      final Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+                                                      // Access document data (e.g., content, author, etc.)
+                                                      print("Level $i: ${data['content']}"); // Assuming 'content' field exists
+                                                    }
+                                                  } else {
+                                                    print("No documents found at level $i");
+                                                  }
+                                                });
+                                              }
+
                                             ],
                                           ),
                                         );
@@ -561,6 +456,141 @@ class AnswerPage extends StatelessWidget {
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 240, 240, 240));
+  }
+
+  Widget replyButtons (BuildContext context, String curDocID) {
+    //............... REACTION BUTTONS FOR REPLY COMMENTS............//
+    return Row(
+      mainAxisAlignment:
+          MainAxisAlignment.end,
+      children: [
+
+        IconButton(
+          onPressed: () {
+            final commentController = TextEditingController();
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (context) => Padding(
+                padding: EdgeInsets.only(
+                  top: 20.0,
+                  right: 20.0,
+                  left: 20.0,
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      decoration: const InputDecoration(hintText: 'Type reply here'),
+                      controller: commentController,
+                      autofocus: true,
+                      onSubmitted: (text) {
+                        print("Reply: $text");
+                      },
+                    ),
+
+                    IconButton(
+                      onPressed: () async {
+                        final firestore = FirebaseFirestore.instance;
+                        final replyContent = commentController.text;
+                        String? name;
+                        String? imageUrl;
+                        String currentUser = FirebaseAuth.instance.currentUser!.uid;
+
+                        try {
+                          final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(currentUser)
+                          .get();
+
+                          if (documentSnapshot.exists) {
+                            final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
+                            name = data['name'];
+                            imageUrl = data['dp-url'];
+                          } else {
+                            print('Document does not exist');
+                          }
+
+                          int? level;
+
+                          try {
+                            final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                              .collection('posts')
+                              .doc(postID)
+                              .collection('answers')
+                              .doc(curDocID)
+                              .get();
+
+                              final Map<String, dynamic> subData = documentSnapshot.data()! as Map<String, dynamic>;
+                              level = subData['level'];
+
+                          } catch(error) {
+                              print(
+                                'Error sending message: $error');
+                          }
+
+                          final newLevel = level! + 1;
+
+                          await firestore
+                              .collection('posts')
+                              .doc(postID)
+                              .collection('answers')
+                              .doc()
+                              .set({
+                                'content': replyContent,
+                                'createdAt': FieldValue.serverTimestamp(),
+                                'authorID': FirebaseAuth.instance.currentUser!.uid,
+                                'authorName': name,
+                                'dp-url': imageUrl,
+                                'level': newLevel,
+                                'parent': curDocID,
+                                'upvotes': [],
+                                'downvotes': [],
+                                'totalReplies': 0,
+                              },
+                          );
+                          commentController.clear();
+                        } catch (error) {
+                          print(
+                              'Error sending message: $error');
+                        }
+                      },
+                      icon: const Text('Send'),
+                    ),                                                                
+                  ],
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.comment, color: Colors.grey),
+        ),
+
+
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.arrow_upward_rounded,
+            color: Colors.grey,
+          ),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.arrow_downward_rounded,
+            color: Colors.grey,
+          ),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: const Icon(
+            Icons.share,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
   }
 
 }
