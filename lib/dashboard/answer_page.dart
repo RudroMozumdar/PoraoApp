@@ -413,33 +413,11 @@ class AnswerPage extends StatelessWidget {
 
                                               //............... REACTION BUTTONS FOR REPLY COMMENTS............//
                                               replyButtons(context, curDocID),
-                                              
+
                                               //........REPLY TO A PARTICULAR COMMENT..........//
-                                              Stream<QuerySnapshot> querySnapshotStream;
-
-                                              for (int i = 1; i < 15; i++) { // Assuming loop iterates from 1 to 14
-                                                querySnapshotStream = FirebaseFirestore.instance
-                                                    .collection('posts')
-                                                    .doc(postID)
-                                                    .collection('answers')
-                                                    .where('level', isEqualTo: i)
-                                                    .snapshots();
-
-                                                // Handle the stream of QuerySnapshots for each level
-                                                querySnapshotStream.listen((snapshot) {
-                                                  if (snapshot.docs.isNotEmpty) {
-                                                    // Process documents at the current level 'i'
-                                                    for (final DocumentSnapshot doc in snapshot.docs) {
-                                                      final Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
-                                                      // Access document data (e.g., content, author, etc.)
-                                                      print("Level $i: ${data['content']}"); // Assuming 'content' field exists
-                                                    }
-                                                  } else {
-                                                    print("No documents found at level $i");
-                                                  }
-                                                });
+                                              for (int i = 1; i <= 15; i++){
+                                                
                                               }
-
                                             ],
                                           ),
                                         );
@@ -456,6 +434,62 @@ class AnswerPage extends StatelessWidget {
           ),
         ),
         backgroundColor: const Color.fromARGB(255, 240, 240, 240));
+  }
+
+  @override
+  void initState(String postID) {
+    for (int level = 1; level <= 15; level++) {
+      
+    }
+  }
+
+  Widget levelWiseReply(int level, String postID) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postID)
+          .collection('answers')
+          .where('level', isEqualTo: level)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+
+        if (!snapshot.hasData) {
+          return const CircularProgressIndicator();
+        }
+
+        final snapshotData = snapshot.data!;
+        if (snapshotData.docs.isEmpty) {
+          return Text("No documents found at level $level");
+        }
+
+        return ListView.builder(
+          // ... Existing ListView.builder logic (shrinkWrap, physics)
+          itemCount: snapshotData.docs.length,
+          itemBuilder: (context, index) {
+            final doc = snapshotData.docs[index];
+            final data = doc.data()! as Map<String, dynamic>;
+
+            // Access document data (content, author, etc.)
+            final content = data['content'];
+            final dpURL = data['dp-url'];
+            final author = data['authorName'];
+            final timeOfCreation = data['createdAt'] as Timestamp;
+
+            return Container(
+              // ... Existing container styling and basic reply content
+              children: [
+                // Reply content and buttons (existing logic)
+                replyButtons(context, doc.id), // Pass the document ID
+                // ... (Remove the unnecessary for loop here)
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget replyButtons (BuildContext context, String curDocID) {
