@@ -1,5 +1,25 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:porao_app/common/all_import.dart';
+
+class Stack<E> {
+  final _list = <E>[];
+
+  void push(E value) => _list.add(value);
+
+  E pop() => _list.removeLast();
+
+  E get peek => _list.last;
+
+  bool get isEmpty => _list.isEmpty;
+  bool get isNotEmpty => _list.isNotEmpty;
+
+  @override
+  String toString() => _list.toString();
+
+  int length() => _list.length;
+}
 
 class AnswerPage extends StatelessWidget {
   final String postID;
@@ -9,8 +29,12 @@ class AnswerPage extends StatelessWidget {
   final String questionTitle;
   final String privacyType;
   final Timestamp postTimestamp;
+  final replies = Stack<Map<String, dynamic>>();
+  final repliesID = Stack<String>();
+  final db = FirebaseFirestore.instance;
 
-  const AnswerPage({
+
+  AnswerPage({
     super.key,
     required this.postID,
     required this.authorName,
@@ -147,91 +171,86 @@ class AnswerPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
 
-                        IconButton( //..........Comment Button .............//
+                        IconButton( //..................... MAIN POST COMMENT BUTTON..................//
                           onPressed: () {
                             final commentController = TextEditingController();
-
                             showModalBottomSheet<void>(
                               context: context,
-                              builder: (BuildContext context) {
-                                final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+                              isScrollControlled: true,
+                              builder: (context) => Padding(
+                                padding: EdgeInsets.only(
+                                  top: 20.0,
+                                  right: 20.0,
+                                  left: 20.0,
+                                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextField(
+                                      decoration: const InputDecoration(hintText: 'Type reply here'),
+                                      controller: commentController,
+                                      autofocus: true,
+                                      onSubmitted: (text) {
+                                        print("Reply: $text");
+                                      },
+                                    ),
 
-                                return Container(
-                                  padding: EdgeInsets.only(
-                                    top: 10,
-                                    left: 10,
-                                    right: 10,
-                                    bottom: keyboardHeight,
-                                  ),
-                                  height: 80,
+                                    IconButton(  //.............Send Button For Comment...........//
+                                      onPressed: () async {
+                                        final firestore = FirebaseFirestore.instance;
+                                        final commentContent = commentController.text;
+                                        String? name;
+                                        String? imageUrl;
+                                        String currentUser = FirebaseAuth.instance.currentUser!.uid;
 
-                                  child: Row(
-                                    children: [
+                                        try {
+                                          final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(currentUser)
+                                          .get();
 
-                                      Expanded(
-                                        child: TextField(
-                                          controller: commentController,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Enter your comment...',
-                                          ),
-                                        ),
-                                      ),
-
-                                      IconButton(  //.............Send Button For Comment...........//
-                                        onPressed: () async {
-                                          final firestore = FirebaseFirestore.instance;
-                                          final commentContent = commentController.text;
-                                          String? name;
-                                          String? imageUrl;
-                                          String currentUser = FirebaseAuth.instance.currentUser!.uid;
-
-                                          try {
-                                            final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc(currentUser)
-                                            .get();
-
-                                            if (documentSnapshot.exists) {
-                                              final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
-                                              name = data['name'];
-                                              imageUrl = data['dp-url'];
-                                            } else {
-                                              print('Document does not exist');
-                                            }
-
-                                            await firestore
-                                                .collection('posts')
-                                                .doc(postID)
-                                                .collection('answers')
-                                                .doc()
-                                                .set({
-                                                  'content': commentContent,
-                                                  'createdAt': FieldValue.serverTimestamp(),
-                                                  'authorID': FirebaseAuth.instance.currentUser!.uid,
-                                                  'authorName': name,
-                                                  'dp-url': imageUrl,
-                                                  'level': 0,
-                                                  'parent': "",
-                                                  'upvotes': [],
-                                                  'downvotes': [],
-                                                  'totalReplies': 0,
-                                                },
-                                            );
-                                            commentController.clear();
-                                          } catch (error) {
-                                            print(
-                                                'Error sending message: $error');
+                                          if (documentSnapshot.exists) {
+                                            final Map<String, dynamic> data = documentSnapshot.data()! as Map<String, dynamic>;
+                                            name = data['name'];
+                                            imageUrl = data['dp-url'];
+                                          } else {
+                                            print('Document does not exist');
                                           }
-                                        },
-                                        icon: const Icon(Icons.send),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          icon: const Icon(Icons.comment, color: Colors.white),
+
+                                          await firestore
+                                              .collection('posts')
+                                              .doc(postID)
+                                              .collection('answers')
+                                              .doc()
+                                              .set({
+                                                'content': commentContent,
+                                                'createdAt': FieldValue.serverTimestamp(),
+                                                'authorID': FirebaseAuth.instance.currentUser!.uid,
+                                                'authorName': name,
+                                                'dp-url': imageUrl,
+                                                'level': 0,
+                                                'children': [],
+                                                'upvotes': [],
+                                                'downvotes': [],
+                                                'totalReplies': 0,
+                                              },
+                                          );
+                                          commentController.clear();
+                                        } catch (error) {
+                                          print(
+                                              'Error sending message: $error');
+                                        }
+                                      },
+                                      icon: const Icon(Icons.send),
+                                    ),                                                            
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                         icon: const Icon(Icons.comment, color: Colors.white),
                         ),
 
                         IconButton(
@@ -329,8 +348,7 @@ class AnswerPage extends StatelessWidget {
                                     final documents = snapshot.data!.docs;
                                     return ListView.builder(
                                       shrinkWrap: true,
-                                      physics:
-                                        const NeverScrollableScrollPhysics(),
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemCount: documents.length,
                                       itemBuilder: (context, index) {
                                         final data = documents[index].data()! as Map<String, dynamic>;
@@ -415,9 +433,8 @@ class AnswerPage extends StatelessWidget {
                                               replyButtons(context, curDocID),
 
                                               //........REPLY TO A PARTICULAR COMMENT..........//
-                                              for (int i = 1; i <= 15; i++){
-                                                
-                                              }
+                                              
+                                              
                                             ],
                                           ),
                                         );
@@ -436,67 +453,10 @@ class AnswerPage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 240, 240, 240));
   }
 
-  @override
-  void initState(String postID) {
-    for (int level = 1; level <= 15; level++) {
-      
-    }
-  }
-
-  Widget levelWiseReply(int level, String postID) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('posts')
-          .doc(postID)
-          .collection('answers')
-          .where('level', isEqualTo: level)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        }
-
-        if (!snapshot.hasData) {
-          return const CircularProgressIndicator();
-        }
-
-        final snapshotData = snapshot.data!;
-        if (snapshotData.docs.isEmpty) {
-          return Text("No documents found at level $level");
-        }
-
-        return ListView.builder(
-          // ... Existing ListView.builder logic (shrinkWrap, physics)
-          itemCount: snapshotData.docs.length,
-          itemBuilder: (context, index) {
-            final doc = snapshotData.docs[index];
-            final data = doc.data()! as Map<String, dynamic>;
-
-            // Access document data (content, author, etc.)
-            final content = data['content'];
-            final dpURL = data['dp-url'];
-            final author = data['authorName'];
-            final timeOfCreation = data['createdAt'] as Timestamp;
-
-            return Container(
-              // ... Existing container styling and basic reply content
-              children: [
-                // Reply content and buttons (existing logic)
-                replyButtons(context, doc.id), // Pass the document ID
-                // ... (Remove the unnecessary for loop here)
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget replyButtons (BuildContext context, String curDocID) {
     //............... REACTION BUTTONS FOR REPLY COMMENTS............//
     return Row(
-      mainAxisAlignment:
-          MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
 
         IconButton(
@@ -527,7 +487,6 @@ class AnswerPage extends StatelessWidget {
 
                     IconButton(
                       onPressed: () async {
-                        final firestore = FirebaseFirestore.instance;
                         final replyContent = commentController.text;
                         String? name;
                         String? imageUrl;
@@ -567,31 +526,51 @@ class AnswerPage extends StatelessWidget {
 
                           final newLevel = level! + 1;
 
-                          await firestore
-                              .collection('posts')
-                              .doc(postID)
-                              .collection('answers')
-                              .doc()
-                              .set({
-                                'content': replyContent,
-                                'createdAt': FieldValue.serverTimestamp(),
-                                'authorID': FirebaseAuth.instance.currentUser!.uid,
-                                'authorName': name,
-                                'dp-url': imageUrl,
-                                'level': newLevel,
-                                'parent': curDocID,
-                                'upvotes': [],
-                                'downvotes': [],
-                                'totalReplies': 0,
-                              },
-                          );
+                          Future<String> addReplyToFirestore(String postID, String replyContent, String? name, String? imageUrl, int newLevel) async {
+                            final CollectionReference repliesRef = FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(postID)
+                                .collection('answers');
+
+                            final DocumentReference newReplyRef = await repliesRef.add({
+                              'content': replyContent,
+                              'createdAt': FieldValue.serverTimestamp(),
+                              'authorID': FirebaseAuth.instance.currentUser!.uid,
+                              'authorName': name,
+                              'dp-url': imageUrl,
+                              'level': newLevel,
+                              'children': [],
+                              'upvotes': [],
+                              'downvotes': [],
+                              'totalReplies': 0,
+                            });
+
+                            return newReplyRef.id; // Return the DocumentReference of the newly created document
+                           }
+                           String? newReplyRef;
+
+                          try{
+                            newReplyRef = await addReplyToFirestore(postID, replyContent, name, imageUrl, newLevel);
+                          }  catch (error) {
+                              print('Error sending message: $error');
+                          } finally {
+                            Navigator.pop(context); // Close the bottomsheet regardless of success/failure
+                          }                  
+
+                          final parentRef = db.collection('posts').doc(postID).collection('answers').doc(curDocID);
+
+                          parentRef.update({
+                            "children": FieldValue.arrayUnion([newReplyRef]),
+                            "totalReplies": FieldValue.increment(1),
+                          });
+
                           commentController.clear();
                         } catch (error) {
                           print(
                               'Error sending message: $error');
                         }
                       },
-                      icon: const Text('Send'),
+                      icon: const Icon(Icons.send),
                     ),                                                                
                   ],
                 ),
@@ -626,6 +605,8 @@ class AnswerPage extends StatelessWidget {
       ],
     );
   }
+
+  
 
 }
 
