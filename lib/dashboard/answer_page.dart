@@ -241,7 +241,9 @@ class AnswerPage extends StatelessWidget {
                                         } catch (error) {
                                           print(
                                               'Error sending message: $error');
-                                        }
+                                        }finally {
+                                          Navigator.pop(context); // Close the bottomsheet regardless of success/failure
+                                        } 
                                       },
                                       icon: const Icon(Icons.send),
                                     ),                                                            
@@ -346,7 +348,7 @@ class AnswerPage extends StatelessWidget {
                                       child: CircularProgressIndicator());
                                   default:
                                     final documents = snapshot.data!.docs;
-                                    return ListView.builder(
+                                    return ListView.builder (
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
                                       itemCount: documents.length,
@@ -358,86 +360,11 @@ class AnswerPage extends StatelessWidget {
                                         final String dpURL = data['dp-url'];
                                         final String author = data['authorName'];
                                         final timeOfCreation = data['createdAt'] as Timestamp;
+                                        final int level = data['level'];
+                                        double newLevel = level + 0.0;
+                                        newLevel *= 10;
 
-                                        return Container(  //............CONTAINS INDIVIDUAL REPLIES........//
-                                          width: double.infinity,
-                                          padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-                                          margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                                          decoration: const BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                              Radius.circular(10),
-                                            ),
-                                            color: Colors.white,
-                                          ),
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  CircleAvatar(  //............ DISPLAY PICTURE..........//
-                                                    radius: 20,
-                                                    backgroundImage:
-                                                        NetworkImage(dpURL),
-                                                  ),
-
-                                                  Container(  
-                                                    width: 10,
-                                                  ),
-
-                                                  Text(  //.................... NAME OF AUTHOR ........//
-                                                    author,
-                                                    style: const TextStyle(
-                                                      fontSize: 18.5,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-
-                                                  Container(
-                                                    width: 15,
-                                                  ),
-
-                                                  Text(
-                                                    formatTimeDifference(
-                                                        DateTime.now()
-                                                            .difference(
-                                                                timeOfCreation
-                                                                    .toDate())),
-                                                    style: TextStyle(
-                                                        fontFamily: primaryFont,
-                                                        color: Colors.black,
-                                                        fontSize: 13),
-                                                  ),
-                                                ],
-                                              ),
-
-                                              Container(
-                                                height: 5,
-                                                alignment: Alignment.bottomLeft,
-                                              ),
-
-                                              Container(  //............... CONTENT OF THE REPLY............//
-                                                alignment: Alignment.bottomLeft,
-                                                child: Text(
-                                                  content,
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                  ),
-                                                  textAlign: TextAlign.justify,
-                                                ),
-                                              ),
-
-                                              //............... REACTION BUTTONS FOR REPLY COMMENTS............//
-                                              replyButtons(context, curDocID),
-
-                                              //........REPLY TO A PARTICULAR COMMENT..........//
-                                              
-                                              
-                                            ],
-                                          ),
-                                        );
+                                        return buildReplyBox(dpURL, author, timeOfCreation, content, context, curDocID, newLevel);
                                       },
                                     );
                                 }
@@ -604,11 +531,218 @@ class AnswerPage extends StatelessWidget {
         ),
       ],
     );
+  }  
+
+  Widget buildReplyBox (String dpURL, String author, Timestamp timeOfCreation, String content, BuildContext context, String curDocID, double forPadding) {
+
+    return Container(  //............CONTAINS INDIVIDUAL REPLIES........//
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(
+          Radius.circular(10),
+        ),
+        color: Colors.white,
+      ),
+      child: Padding(
+        padding: EdgeInsets.only(left: forPadding),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                CircleAvatar(  //............ DISPLAY PICTURE..........//
+                  radius: 20,
+                  backgroundImage:
+                      NetworkImage(dpURL),
+                ),
+        
+                Container(  
+                  width: 10,
+                ),
+        
+                Text(  //.................... NAME OF AUTHOR ........//
+                  author,
+                  style: const TextStyle(
+                    fontSize: 18.5,
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+        
+                Container(
+                  width: 15,
+                ),
+        
+                Text(
+                  formatTimeDifference(
+                      DateTime.now()
+                          .difference(
+                              timeOfCreation
+                                  .toDate())),
+                  style: TextStyle(
+                      fontFamily: primaryFont,
+                      color: Colors.black,
+                      fontSize: 13),
+                ),
+              ],
+            ),
+        
+            Container(
+              height: 5,
+              alignment: Alignment.bottomLeft,
+            ),
+        
+            Container(  //............... CONTENT OF THE REPLY............//
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight:
+                      FontWeight.normal,
+                ),
+                textAlign: TextAlign.justify,
+              ),
+            ),
+        
+            //............... REACTION BUTTONS FOR REPLY COMMENTS............//
+            replyButtons(context, curDocID),      
+        
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('posts')
+                  .doc(postID)
+                  .collection('answers')
+                  .doc(curDocID)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final documentData = snapshot.data!.data()! as Map<String, dynamic>;
+                final List<dynamic> childrenArray = documentData['children'];
+        
+                if (childrenArray.isEmpty){
+                  return Container();
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: childrenArray.length,
+                    itemBuilder: (context, index) {
+                        return StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                          .collection('posts')
+                          .doc(postID)
+                          .collection('answers')
+                          .doc(childrenArray[index])
+                          .snapshots(),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            }
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            final childData = snapshot.data!.data()! as Map<String, dynamic>;
+        
+                            final String replyID = snapshot.data!.id;
+                            final String content = childData['content'];
+                            final String dpURL = childData['dp-url'];
+                            final String author = childData['authorName'];
+                            final timeOfCreation = childData['createdAt'] as Timestamp;
+                            final int level = childData['level'];
+                            double newLevel = level + 0.0;
+                            newLevel *= 10;
+        
+                            return buildReplyBox(dpURL, author, timeOfCreation, content, context, replyID, newLevel);
+                          }
+                        );
+                    }
+                  );
+                }
+        
+              }
+            )
+        
+          ],
+        ),
+      ),
+    );
   }
 
-  
-
 }
+
+class RecursiveDocumentPrinter extends StatelessWidget {
+  final String parentDocID;
+
+  const RecursiveDocumentPrinter({Key? key, required this.parentDocID})
+      : super(key: key);
+
+  
+  Widget temp () {
+    return Text(parentDocID);
+  }
+
+  Future<Widget> _fetchDataAndPrint(BuildContext context) async {
+  try {
+    final docRef = FirebaseFirestore.instance.collection('your_collection').doc(parentDocID);
+    final docSnapshot = await docRef.get();
+
+    final data = docSnapshot.data()!;
+
+    // Print specific fields
+    Text(data['content']);
+
+    // Check for "children" field and handle empty case
+    final children = data['children'] as List<String>?;
+    if (children?.isEmpty ?? true) {
+      return Container(); // Correct: exit if children is empty or null
+    }
+
+    // Recursive call using ListView.builder
+    await Future.delayed(const Duration(milliseconds: 500)); // Simulate async operation (remove if not needed)
+    return Future.value(ListView.builder(
+      shrinkWrap: true, // Adjust as needed
+      physics: const NeverScrollableScrollPhysics(), // Adjust as needed
+      itemCount: children!.length,
+      itemBuilder: (context, index) {
+        final childDocID = children[index];
+        return RecursiveDocumentPrinter(parentDocID: childDocID);
+      },
+    ));
+  } catch (error) {
+    print('Error fetching data: $error');
+  }
+
+  return Text("data");
+}
+
+
+@override
+Widget build(BuildContext context) {
+  return FutureBuilder<void>(
+    future: _fetchDataAndPrint(context),
+    builder: (context, snapshot) {
+      if (snapshot.hasError) {
+        return Text('Error: ${snapshot.error}');
+      }
+
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return Container(); // You can customize the empty state here
+    },
+  );
+}
+}
+
 
 class AnswerSection extends StatefulWidget {
   const AnswerSection({super.key});
