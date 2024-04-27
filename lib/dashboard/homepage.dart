@@ -181,6 +181,10 @@ class _HomePageState extends State<HomePage> {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
               child: Container(
+                padding: const EdgeInsets.only(
+                  top: 10,
+                  bottom: 10,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: seconderyColor,
@@ -254,112 +258,130 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color:
-                                vote == 1 ? primaryColor : Colors.transparent,
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              if (vote == 0) {
-                                docRef.update({
-                                  'upvotes': FieldValue.arrayUnion(
-                                      [Auth().currentUser?.uid])
-                                });
-                              } else if (vote == -1) {
-                                docRef.update({
-                                  'downvotes': FieldValue.arrayRemove(
-                                      [Auth().currentUser?.uid])
-                                });
-                                docRef.update({
-                                  'upvotes': FieldValue.arrayUnion(
-                                      [Auth().currentUser?.uid])
-                                });
-                              } else {
-                                docRef.update({
-                                  'upvotes': FieldValue.arrayRemove(
-                                      [Auth().currentUser?.uid])
-                                });
-                              }
-                            },
-                            icon: const Icon(Icons.arrow_upward_rounded),
-                            tooltip: 'Upvote',
-                            color: vote == 1 ? Colors.white : Colors.black,
-                          ),
-                        ),
-                        Text((post['upvotes'].length - post['downvotes'].length)
-                            .toString()),
-                        // -----------------------------------------------------------------Downvote Button
-                        Container(
-                          decoration: BoxDecoration(
-                            color:
-                                vote == -1 ? primaryColor : Colors.transparent,
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              if (vote == 0) {
-                                docRef.update({
-                                  'downvotes': FieldValue.arrayUnion(
-                                      [Auth().currentUser?.uid])
-                                });
-                              } else if (vote == 1) {
-                                docRef.update({
-                                  'upvotes': FieldValue.arrayRemove(
-                                      [Auth().currentUser?.uid])
-                                });
-                                docRef.update({
-                                  'downvotes': FieldValue.arrayUnion(
-                                      [Auth().currentUser?.uid])
-                                });
-                              } else {
-                                docRef.update({
-                                  'downvotes': FieldValue.arrayRemove(
-                                      [Auth().currentUser?.uid])
-                                });
-                              }
-                            },
-                            icon: const Icon(Icons.arrow_downward_rounded),
-                            tooltip: 'Downvote',
-                            color: vote == -1 ? Colors.white : Colors.black,
+
+                        IconButton( //................... Comment Button
+                                onPressed: () {
+                                  // Get the question data (replace with your actual way of accessing data)
+                                  final String docID = post.id;
+                                  final String authorName = post['authorName'];
+                                  final String authorID = post['authorId'];
+                                  final String content = post['content'];
+                                  final String title = post['title'];
+                                  final String privacy = post['privacy'];
+                                  final timestamp = post['createdAt'] as Timestamp;
+                            
+                                  // Navigate to the AnswerPage with data
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AnswerPage(
+                                          postID: docID,
+                                          authorName: authorName,
+                                          authorID: authorID,
+                                          questionContent: content,
+                                          questionTitle: title,
+                                          privacyType: privacy,
+                                          postTimestamp: timestamp,
+                                          voteCount: vote,
+                                      ),                                    
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.comment),
+                              ),
+
+                        
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  if (vote == 0) {
+                                    docRef.update({
+                                      'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+                                    });
+                                  } else if (vote == -1) {
+                                    docRef.update({
+                                      'downvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+                                    });
+                                    docRef.update({
+                                      'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+                                    });
+                                  } else {
+                                    docRef.update({
+                                      'upvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+                                    });
+                                  }
+                                },
+                                icon: const Icon(Icons.arrow_upward_rounded),
+                                tooltip: 'Upvote',
+                                color: vote == 1 ? Colors.blue : Colors.black,
+                              ), // Added missing closing curly brace here
+
+                              const SizedBox(
+                                width: 25,
+                              ),
+                              
+                              Container(
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: primaryColor,
+                                ),
+
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    (post['upvotes'].length - post['downvotes'].length).toString(), // Total Vote count
+                                  ),
+                                ),
+                              ),
+                              
+                              const SizedBox(
+                                width: 25,
+                              ),
+                                  // -----------------------------------------------------------------Downvote Button
+                                IconButton(
+                                  onPressed: () {
+                                    if (vote == 0) {
+                                      docRef.update({
+                                        'downvotes': FieldValue.arrayUnion(
+                                            [Auth().currentUser?.uid])
+                                      });
+                                    } else if (vote == 1) {
+                                      docRef.update({
+                                        'upvotes': FieldValue.arrayRemove(
+                                            [Auth().currentUser?.uid])
+                                      });
+                                      docRef.update({
+                                        'downvotes': FieldValue.arrayUnion(
+                                            [Auth().currentUser?.uid])
+                                      });
+                                    } else {
+                                      docRef.update({
+                                        'downvotes': FieldValue.arrayRemove(
+                                            [Auth().currentUser?.uid])
+                                      });
+                                    }
+                                  },
+                                  icon: const Icon(Icons.arrow_downward_rounded),
+                                  tooltip: 'Downvote',
+                                  color: vote == -1 ? Colors.blue : Colors.black,
+                                ),
+                              ],
+                            ),
+                          
+                            
+                          
+                        IconButton(
+                          onPressed: () {},
+                          icon: const Icon(
+                            Icons.share,
+                            color: Colors.black,
                           ),
                         ),
                       ],                      
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            // Get the question data (replace with your actual way of accessing data)
-                            final String docID = post.id;
-                            final String authorName = post['authorName'];
-                            final String authorID = post['authorId'];
-                            final String content = post['content'];
-                            final String title = post['title'];
-                            final String privacy = post['privacy'];
-                            final timestamp = post['createdAt'] as Timestamp;
-
-                            // Navigate to the AnswerPage with data
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AnswerPage(
-                                    postID: docID,
-                                    authorName: authorName,
-                                    authorID: authorID,
-                                    questionContent: content,
-                                    questionTitle: title,
-                                    privacyType: privacy,
-                                    postTimestamp: timestamp,
-                                ),                                    
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.comment),
-                        ),
-                      ],
-                    ),
+                    ),                    
                   ],
                 ),
               ),

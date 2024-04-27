@@ -1,6 +1,9 @@
 import 'dart:ffi';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class Stack<E> {
@@ -21,7 +24,8 @@ class Stack<E> {
   int length() => _list.length;
 }
 
-class AnswerPage extends StatelessWidget {
+class AnswerPage extends StatefulWidget {
+
   final String postID;
   final String authorName;
   final String authorID;
@@ -29,13 +33,11 @@ class AnswerPage extends StatelessWidget {
   final String questionTitle;
   final String privacyType;
   final Timestamp postTimestamp;
-  final replies = Stack<Map<String, dynamic>>();
-  final repliesID = Stack<String>();
   final db = FirebaseFirestore.instance;
-
+  final int voteCount;
 
   AnswerPage({
-    super.key,
+    Key? key,
     required this.postID,
     required this.authorName,
     required this.authorID,
@@ -43,7 +45,73 @@ class AnswerPage extends StatelessWidget {
     required this.questionTitle,
     required this.privacyType,
     required this.postTimestamp,
-  });
+    required this.voteCount,
+  }) : super(key: key);
+
+  @override
+  _AnswerPageState createState() => _AnswerPageState();
+}
+
+class _AnswerPageState extends State<AnswerPage> {
+  int vote = 0;
+  bool _isUpvoteSelected = false;
+  bool _isDownvoteSelected = false;
+
+  void _toggleUpvote() {
+    setState(() {
+      _isUpvoteSelected = !_isUpvoteSelected;
+      if(_isUpvoteSelected){
+        _isDownvoteSelected = false;
+      }
+    });
+  }
+
+  void _toggleDownvote() {
+    setState(() {
+      _isDownvoteSelected = !_isDownvoteSelected;
+      if(_isDownvoteSelected){
+        _isUpvoteSelected = false;
+      }
+    });
+  }
+
+  void upvote() async {
+    setState(() {
+      vote = 1;
+    });
+  }
+
+  void neutralVote() async {
+    setState(() {
+      vote = 0;
+    });
+  }
+
+  void downvote()async {
+    setState(() {
+      vote = -1;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    vote = widget.voteCount;
+
+    if (widget.voteCount == -1){
+      _isUpvoteSelected = false;
+      _isDownvoteSelected = true;
+      
+    }
+    if (widget.voteCount == 0){
+      _isUpvoteSelected = false;
+      _isDownvoteSelected = false;
+    }
+    if (widget.voteCount == 1){
+      _isUpvoteSelected = true;
+      _isDownvoteSelected = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +149,7 @@ class AnswerPage extends StatelessWidget {
                             onPressed: () {},
                             icon: Flexible(
                               child: Text(
-                                authorName,
+                                widget.authorName,
                                 style: const TextStyle(
                                   fontSize: 25,
                                   color: Colors.white,
@@ -90,16 +158,16 @@ class AnswerPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const Text(
-                            '. ',
-                            style: TextStyle(
-                              fontSize: 25,
-                              color: Colors.white,
-                            ),
-                          ),
+                          // const Text(
+                          //   '. ',
+                          //   style: TextStyle(
+                          //     fontSize: 25,
+                          //     color: Colors.white,
+                          //   ),
+                          // ),
                           Text(
                             formatTimeDifference(DateTime.now()
-                                .difference(postTimestamp.toDate())),
+                                .difference(widget.postTimestamp.toDate())),
                             style: TextStyle(
                                 fontFamily: primaryFont,
                                 color: Colors.white,
@@ -125,7 +193,7 @@ class AnswerPage extends StatelessWidget {
                     ),
 
                     child: Text(
-                      questionTitle,
+                      widget.questionTitle,
                       style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -149,7 +217,7 @@ class AnswerPage extends StatelessWidget {
                     ),
 
                     child: Text(
-                      questionContent,
+                      widget.questionContent,
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -159,7 +227,7 @@ class AnswerPage extends StatelessWidget {
                   ),
 
                   Container(
-                    //...........MAIN COMMENT, UPVOTE, DOWNVOTE, SHARE .........//
+                    //...........MAIN COMMENT,UPVOTE, DOWNVOTE, SHARE .........//
                     width: double.infinity,
                     margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     decoration: BoxDecoration(
@@ -219,9 +287,15 @@ class AnswerPage extends StatelessWidget {
                                             print('Document does not exist');
                                           }
 
+                                          final updatePost = widget.db.collection('posts').doc(widget.postID);
+
+                                          updatePost.update({
+                                            "answerCount": FieldValue.increment(1),
+                                          });
+
                                           await firestore
                                               .collection('posts')
-                                              .doc(postID)
+                                              .doc(widget.postID)
                                               .collection('answers')
                                               .doc()
                                               .set({
@@ -255,20 +329,116 @@ class AnswerPage extends StatelessWidget {
                          icon: const Icon(Icons.comment, color: Colors.white),
                         ),
 
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.arrow_upward_rounded,
-                            color: Colors.white,
-                          ),
-                        ),
+                        Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [                                
+                          IconButton(
+                            onPressed: () async {
+                              DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID);
+                              final DocumentSnapshot docSnap = await FirebaseFirestore.instance
+                                .collection('posts')
+                                .doc(widget.postID)
+                                .get();
 
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.arrow_downward_rounded,
-                            color: Colors.white,
+                              setState(() {
+                                if (docSnap['upvotes'].contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                  upvote();
+                                } else if (docSnap['downvotes'].contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                  downvote();
+                                } else {
+                                  neutralVote();
+                                }
+                              });
+
+                              if (vote == 0) {
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+                                });
+                              } else if (vote == -1) {
+                                docRef.update({
+                                  'downvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+                                });
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+                                });
+                              } else {
+                                docRef.update({
+                                  'upvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+                                });
+                              }
+
+                              _toggleUpvote();
+                            },
+                            icon: const Icon(Icons.arrow_upward_rounded),
+                            tooltip: 'upvote',
+                            color: _isUpvoteSelected ? Colors.cyan : Colors.white,
                           ),
+
+                          const SizedBox(
+                            width: 25,
+                          ),
+
+                          Container(
+                            clipBehavior: Clip.antiAlias,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: primaryButtonColor,
+                            ),
+
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: voteCount(context, widget.db.collection('posts').doc(widget.postID).snapshots()),
+                              ),
+                          ),
+
+                          const SizedBox(
+                            width: 25,
+                          ),
+                          
+                            // -----------------------------------------------------------------downvote Button
+                          IconButton(
+                              onPressed: () async {
+                                DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID);
+                                final DocumentSnapshot docSnap = await FirebaseFirestore.instance
+                                  .collection('posts')
+                                  .doc(widget.postID)
+                                  .get();
+
+                                // Check if user has already voted
+                                setState(() {
+                                  if (docSnap['upvotes'].contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                    upvote();
+                                  } else if (docSnap['downvotes'].contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                    downvote();
+                                  } else {
+                                    neutralVote();
+                                  }
+                                });
+
+                                if (vote == 0) {
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayUnion([Auth().currentUser?.uid])
+                                  });
+                                } else if (vote == 1) {
+                                  docRef.update({
+                                    'upvotes': FieldValue.arrayRemove([Auth().currentUser?.uid])
+                                  });
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayUnion([Auth().currentUser?.uid])
+                                  });
+                                } else {
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayRemove([Auth().currentUser?.uid])
+                                  });
+                                }
+
+                                _toggleDownvote();
+                              },
+                              icon: const Icon(Icons.arrow_downward_rounded),
+                              tooltip: 'downvote',
+                              color: _isDownvoteSelected ? Colors.cyan : Colors.white,
+                            ),
+                          ],
                         ),
 
                         IconButton(
@@ -286,7 +456,7 @@ class AnswerPage extends StatelessWidget {
                   StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('posts')
-                          .doc(postID)
+                          .doc(widget.postID)
                           .collection('answers')
                           .snapshots(),
                       builder: (context, snapshot) {
@@ -306,10 +476,8 @@ class AnswerPage extends StatelessWidget {
                                 child: Container(
                                   width: double.infinity,
                                   height: 150,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                                  margin:
-                                      const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                                   decoration: const BoxDecoration(
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(10),
@@ -317,13 +485,30 @@ class AnswerPage extends StatelessWidget {
                                     color: Colors.white,
                                   ),
                                   child: const Center(
-                                    child: Text(
-                                      "No Answers Yet!",
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          "No Answers Yet!",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+
+                                        SizedBox(height: 20),
+
+                                        Text(
+                                          "Be the first to comment.",
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.grey,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -333,7 +518,7 @@ class AnswerPage extends StatelessWidget {
                             return StreamBuilder<QuerySnapshot>(
                               stream: FirebaseFirestore.instance
                                   .collection('posts')
-                                  .doc(postID)
+                                  .doc(widget.postID)
                                   .collection('answers')
                                   .where('level', isEqualTo: 0)
                                   .snapshots(),
@@ -364,7 +549,17 @@ class AnswerPage extends StatelessWidget {
                                         double newLevel = level + 0.0;
                                         newLevel *= 10;
 
-                                        return buildReplyBox(dpURL, author, timeOfCreation, content, context, curDocID, newLevel);
+                                        int votes = 0;
+
+                                        // Check if user has already voted
+                                        if (data['upvotes'].contains(Auth().currentUser?.uid)) {
+                                          votes = 1;
+                                        } else if (data['downvotes']
+                                            .contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                          votes = -1;
+                                        }
+
+                                        return buildReplyBox(dpURL, author, timeOfCreation, content, context, curDocID, newLevel, votes);
                                       },
                                     );
                                 }
@@ -380,7 +575,7 @@ class AnswerPage extends StatelessWidget {
         backgroundColor: const Color.fromARGB(255, 240, 240, 240));
   }
 
-  Widget replyButtons (BuildContext context, String curDocID) {
+  Widget replyButtons (BuildContext context, String curDocID, int votes) {
     //............... REACTION BUTTONS FOR REPLY COMMENTS............//
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -438,7 +633,7 @@ class AnswerPage extends StatelessWidget {
                           try {
                             final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
                               .collection('posts')
-                              .doc(postID)
+                              .doc(widget.postID)
                               .collection('answers')
                               .doc(curDocID)
                               .get();
@@ -477,18 +672,24 @@ class AnswerPage extends StatelessWidget {
                            String? newReplyRef;
 
                           try{
-                            newReplyRef = await addReplyToFirestore(postID, replyContent, name, imageUrl, newLevel);
+                            newReplyRef = await addReplyToFirestore(widget.postID, replyContent, name, imageUrl, newLevel);
                           }  catch (error) {
                               print('Error sending message: $error');
                           } finally {
                             Navigator.pop(context); // Close the bottomsheet regardless of success/failure
                           }                  
 
-                          final parentRef = db.collection('posts').doc(postID).collection('answers').doc(curDocID);
+                          final parentRef = widget.db.collection('posts').doc(widget.postID).collection('answers').doc(curDocID);
 
                           parentRef.update({
                             "children": FieldValue.arrayUnion([newReplyRef]),
                             "totalReplies": FieldValue.increment(1),
+                          });
+
+                          final updatePost = widget.db.collection('posts').doc(widget.postID);
+
+                          updatePost.update({
+                            "answerCount": FieldValue.increment(1),
                           });
 
                           commentController.clear();
@@ -509,36 +710,93 @@ class AnswerPage extends StatelessWidget {
 
 
         IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.arrow_upward_rounded,
-            color: Colors.grey,
-          ),
+          onPressed: () async {
+            DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID).collection('answers').doc(curDocID);                          
+
+            if (votes == 0) {
+              docRef.update({
+                'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+              });
+            } else if (votes == -1) {
+              docRef.update({
+                'downvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+              });
+              docRef.update({
+                'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
+              });
+            } else {
+              docRef.update({
+                'upvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
+              });
+            }
+          },
+          icon: const Icon(Icons.arrow_upward_rounded, size: 30,),
+          tooltip: 'upvote',
+          color: votes == 1 ? Colors.cyan : Colors.grey,
         ),
+
+        const SizedBox(
+          width: 10,
+        ),
+
+        Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            color: Colors.grey,
+            shape: BoxShape.circle            
+          ),
+
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: voteCount(context, widget.db.collection('posts').doc(widget.postID).collection('answers').doc(curDocID).snapshots()),
+          ),
+          
+        ),
+
+        const SizedBox(
+          width: 10,
+        ),
+              
+        // -----------------------------------------------------------------Downvote Button
         IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.arrow_downward_rounded,
-            color: Colors.grey,
-          ),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.share,
-            color: Colors.grey,
-          ),
-        ),
+          onPressed: () async {
+            DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID).collection('answers').doc(curDocID);                   
+
+            if (votes == 0) {
+              docRef.update({
+                'downvotes': FieldValue.arrayUnion(
+                    [Auth().currentUser?.uid])
+              });
+            } else if (votes == 1) {
+              docRef.update({
+                'upvotes': FieldValue.arrayRemove(
+                    [Auth().currentUser?.uid])
+              });
+              docRef.update({
+                'downvotes': FieldValue.arrayUnion(
+                    [Auth().currentUser?.uid])
+              });
+            } else {
+              docRef.update({
+                'downvotes': FieldValue.arrayRemove(
+                    [Auth().currentUser?.uid])
+              });
+            }
+          },
+          icon: const Icon(Icons.arrow_downward_rounded, size: 30,),
+          tooltip: 'Downvote',
+          color: votes == -1 ? Colors.cyan : Colors.grey,             
+        ),          
       ],
     );
   }  
 
-  Widget buildReplyBox (String dpURL, String author, Timestamp timeOfCreation, String content, BuildContext context, String curDocID, double forPadding) {
+  Widget buildReplyBox (String dpURL, String author, Timestamp timeOfCreation, String content, BuildContext context, String curDocID, double forPadding, int votes) {
 
     return Container(  //............CONTAINS INDIVIDUAL REPLIES........//
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
-      margin: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+      padding: forPadding == 0.0 ? const EdgeInsets.fromLTRB(20, 20, 20, 20) : const EdgeInsets.fromLTRB(20, 0, 0, 0), //level wise padding
+      margin: forPadding == 0.0 ? const EdgeInsets.fromLTRB(10, 0, 10, 10) : const EdgeInsets.all(0.0), //level wise margin
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(10),
@@ -608,12 +866,12 @@ class AnswerPage extends StatelessWidget {
             ),
         
             //............... REACTION BUTTONS FOR REPLY COMMENTS............//
-            replyButtons(context, curDocID),      
+            replyButtons(context, curDocID, votes),      
         
-            StreamBuilder<DocumentSnapshot>(
+            StreamBuilder<DocumentSnapshot>( //..........CHECKS IF REPLIES HAVE FURTHER CHILDREN OR NOT..........//
               stream: FirebaseFirestore.instance
                   .collection('posts')
-                  .doc(postID)
+                  .doc(widget.postID)
                   .collection('answers')
                   .doc(curDocID)
                   .snapshots(),
@@ -627,10 +885,10 @@ class AnswerPage extends StatelessWidget {
                 final documentData = snapshot.data!.data()! as Map<String, dynamic>;
                 final List<dynamic> childrenArray = documentData['children'];
         
-                if (childrenArray.isEmpty){
+                if (childrenArray.isEmpty){//..............RETURNS NULL IF NO CHILDREN FOUND............//
                   return Container();
                 } else {
-                  return ListView.builder(
+                  return ListView.builder(//.............IF CHILDREN FOUND => FETCHES ALL CHILDREN REPLY USING LISTVIEW.BUILDER...//
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: childrenArray.length,
@@ -638,7 +896,7 @@ class AnswerPage extends StatelessWidget {
                         return StreamBuilder<DocumentSnapshot>(
                           stream: FirebaseFirestore.instance
                           .collection('posts')
-                          .doc(postID)
+                          .doc(widget.postID)
                           .collection('answers')
                           .doc(childrenArray[index])
                           .snapshots(),
@@ -659,8 +917,18 @@ class AnswerPage extends StatelessWidget {
                             final int level = childData['level'];
                             double newLevel = level + 0.0;
                             newLevel *= 10;
+
+                            var votess = 0;
+
+                            // Check if user has already voted
+                            if (childData['upvotes'].contains(Auth().currentUser?.uid)) {
+                              votess = 1;
+                            } else if (childData['downvotes']
+                                .contains(FirebaseAuth.instance.currentUser?.uid)) {
+                              votess = -1;
+                            }
         
-                            return buildReplyBox(dpURL, author, timeOfCreation, content, context, replyID, newLevel);
+                            return buildReplyBox(dpURL, author, timeOfCreation, content, context, replyID, newLevel, votess); //.............RECURSION CALL TO CHECK ALL CHILDREN IN THE TREE.....//
                           }
                         );
                     }
@@ -676,240 +944,75 @@ class AnswerPage extends StatelessWidget {
     );
   }
 
-}
+  Widget voteCount(BuildContext context, Stream<DocumentSnapshot<Map<String, dynamic>>> ref) {
+    int upvoteCount = 0;
+    int downvoteCount = 0;
+    List<dynamic> upvote, downvote;
 
-class RecursiveDocumentPrinter extends StatelessWidget {
-  final String parentDocID;
-
-  const RecursiveDocumentPrinter({Key? key, required this.parentDocID})
-      : super(key: key);
-
-  
-  Widget temp () {
-    return Text(parentDocID);
-  }
-
-  Future<Widget> _fetchDataAndPrint(BuildContext context) async {
-  try {
-    final docRef = FirebaseFirestore.instance.collection('your_collection').doc(parentDocID);
-    final docSnapshot = await docRef.get();
-
-    final data = docSnapshot.data()!;
-
-    // Print specific fields
-    Text(data['content']);
-
-    // Check for "children" field and handle empty case
-    final children = data['children'] as List<String>?;
-    if (children?.isEmpty ?? true) {
-      return Container(); // Correct: exit if children is empty or null
-    }
-
-    // Recursive call using ListView.builder
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate async operation (remove if not needed)
-    return Future.value(ListView.builder(
-      shrinkWrap: true, // Adjust as needed
-      physics: const NeverScrollableScrollPhysics(), // Adjust as needed
-      itemCount: children!.length,
-      itemBuilder: (context, index) {
-        final childDocID = children[index];
-        return RecursiveDocumentPrinter(parentDocID: childDocID);
-      },
-    ));
-  } catch (error) {
-    print('Error fetching data: $error');
-  }
-
-  return Text("data");
-}
-
-
-@override
-Widget build(BuildContext context) {
-  return FutureBuilder<void>(
-    future: _fetchDataAndPrint(context),
-    builder: (context, snapshot) {
-      if (snapshot.hasError) {
-        return Text('Error: ${snapshot.error}');
-      }
-
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        return const Center(child: CircularProgressIndicator());
-      }
-
-      return Container(); // You can customize the empty state here
-    },
-  );
-}
-}
-
-
-class AnswerSection extends StatefulWidget {
-  const AnswerSection({super.key});
-
-  @override
-  State<AnswerSection> createState() => _AnswerSection();
-}
-
-class _AnswerSection extends State<AnswerSection> {
-  List<bool> selectedList = [false, false, false];
-  List<int> voteCounter = [0, 0, 0];
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection('posts').snapshots(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: SizedBox(
-                    width: 50.0,
-                    height: 50.0,
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-
-              final comments = snapshot.data!.docs;
-
-              return ListView.builder(
-                shrinkWrap: true, // Correction: Added closing parenthesis
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: comments.length,
-                itemBuilder: (context, index) {
-                  DocumentSnapshot comment = comments[index];
-                  final timestamp = comment['createdAt'] as Timestamp;
-                  var vote = 0;
-
-                  // Check if user has already voted
-                  if (comment['upvotes'].contains(Auth().currentUser?.uid)) {
-                    vote = 1;
-                  } else if (comment['downvotes']
-                      .contains(FirebaseAuth.instance.currentUser?.uid)) {
-                    vote = -1;
-                  }
-
-                  // final answerController = TextEditingController();
-                  DocumentReference docRef = FirebaseFirestore.instance
-                      .collection('comments')
-                      .doc(comment.id);
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: seconderyColor,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            title: Text(comment['comment']),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text(
-                              formatTimeDifference(DateTime.now()
-                                  .difference(timestamp.toDate())),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: vote == 1
-                                      ? primaryColor
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (vote == 0) {
-                                      docRef.update({
-                                        'upvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else if (vote == -1) {
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                      docRef.update({
-                                        'upvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else {
-                                      docRef.update({
-                                        'upvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    }
-                                  },
-                                  icon: const Icon(Icons.arrow_upward_rounded),
-                                  tooltip: 'Upvote',
-                                  color:
-                                      vote == 1 ? Colors.white : Colors.black,
-                                ),
-                              ),
-                              Text((comment['upvotes'].length -
-                                      comment['downvotes'].length)
-                                  .toString()),
-                              // -----------------------------------------------------------------Downvote Button
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: vote == -1
-                                      ? primaryColor
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (vote == 0) {
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else if (vote == 1) {
-                                      docRef.update({
-                                        'upvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else {
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    }
-                                  },
-                                  icon:
-                                      const Icon(Icons.arrow_downward_rounded),
-                                  tooltip: 'Downvote',
-                                  color:
-                                      vote == -1 ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
+    // Function to fetch and return vote count
+    return StreamBuilder<DocumentSnapshot> (
+      stream: ref,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        final documentData = snapshot.data!.data()! as Map<String, dynamic>;
+        upvote = documentData['upvotes'];
+        downvote = documentData['downvotes'];
+        upvoteCount = upvote.length;
+        downvoteCount = downvote.length;
+        return Text(
+          (upvoteCount - downvoteCount).toString(),
+          style: const TextStyle(
+            color: Colors.white,
           ),
-        ],
-      ),
+        );
+      }    
+    );  
+  }
+
+  bool colorPick(BuildContext context, Stream<DocumentSnapshot<Map<String, dynamic>>> ref) {
+    bool color = true;
+
+    StreamBuilder<DocumentSnapshot>(
+      stream: ref,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final documentData = snapshot.data!.data()! as Map<String, dynamic>;
+          final upvote = documentData['upvotes'];
+          final downvote = documentData['downvotes'];
+          if (upvote.contains(FirebaseAuth.instance.currentUser!.uid)) {
+            color = true;
+          } else if (downvote.contains(FirebaseAuth.instance.currentUser?.uid)) {
+            color = false;
+          }
+        }
+
+        return Container();
+      },
     );
+
+    return color;
+  }
+
+  Widget userVote () {
+
+    return StreamBuilder<DocumentSnapshot>(
+      stream: widget.db.collection('posts').doc(widget.postID).snapshots(),
+      builder: (context, snapshot) {
+        final documentData = snapshot.data!.data()! as Map<String, dynamic>;
+        List<dynamic> upvotes = documentData['upvotes'];
+        List<dynamic> downvotes = documentData['downvotes'];
+
+        if (upvotes.contains(FirebaseAuth.instance.currentUser?.uid)) {
+          upvote();
+        } else if (downvotes.contains(FirebaseAuth.instance.currentUser?.uid)) {
+          downvote();
+        } else {
+          neutralVote();
+        }
+        return Text(vote.toString());
+
+      });
   }
 }

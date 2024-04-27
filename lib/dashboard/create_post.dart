@@ -44,6 +44,7 @@ class _CreatePostState extends State<CreatePost> {
       'upvotes': [],
       'downvotes': [],
       'answers': {},
+      'answersCount': 0,
     });
     setState(() {
       listTags.clear();
