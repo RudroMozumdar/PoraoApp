@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class HomePage extends StatefulWidget {
@@ -198,9 +200,12 @@ class _HomePageState extends State<HomePage> {
                       child: Row(
                         children: [
                           // Image
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage: NetworkImage(post['dp-url']),
+                          GestureDetector(
+                            onTap: (){},
+                            child: CircleAvatar(
+                              radius: 25,
+                              backgroundImage: NetworkImage(post['dp-url']),
+                            ),
                           ),
 
                           // Name
@@ -209,18 +214,23 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                GestureDetector(
-                                  child: Text(
-                                    post['authorName'],
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: primaryFont,
-                                    ),
-                                  ),
-                                  onTap: () {
-                                    // Takes to the profile of the post author
-                                  },
+
+                                SizedBox(
+                                  width: MediaQuery.of(context).size.width/2.0,
+                                  child: GestureDetector(
+                                    onTap: (){}, 
+                                    child: Text(
+                                      post['authorName'],
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: primaryFont,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  )
                                 ),
+
                                 Text(
                                   formatTimeDifference(DateTime.now()
                                       .difference(timestamp.toDate())),
