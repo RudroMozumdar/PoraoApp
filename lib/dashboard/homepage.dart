@@ -279,6 +279,7 @@ class _HomePageState extends State<HomePage> {
                                   final String title = post['title'];
                                   final String privacy = post['privacy'];
                                   final timestamp = post['createdAt'] as Timestamp;
+                                  final String posterDP = post['dp-url'];
                             
                                   // Navigate to the AnswerPage with data
                                   Navigator.push(
@@ -293,6 +294,7 @@ class _HomePageState extends State<HomePage> {
                                           privacyType: privacy,
                                           postTimestamp: timestamp,
                                           voteCount: vote,
+                                          posterDP: posterDP,
                                       ),                                    
                                     ),
                                   );

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:porao_app/common/all_import.dart';
 
@@ -8,13 +9,12 @@ class MessagesThreads extends StatefulWidget {
   State<MessagesThreads> createState() => _MessagesThreads();
 }
 
-class _MessagesThreads extends State<MessagesThreads>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController; // Declare as late
+class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  List<Map<String, dynamic>>? filteredDocuments; // Initialize as null
+  List<Map<String, dynamic>>? filteredDocuments;
 
   var currentUser = FirebaseAuth.instance.currentUser;
 
@@ -22,7 +22,7 @@ class _MessagesThreads extends State<MessagesThreads>
 
   Future<void> _fetchAndFilterMessages() async {
     filteredDocuments = await fetchAndFilterByUserId(currentUser!.uid);
-    setState(() {}); // Trigger rebuild with updated data
+    setState(() {});
   }
 
   String _formatTimestampForDisplay(dynamic timestampValue) {
@@ -98,7 +98,6 @@ class _MessagesThreads extends State<MessagesThreads>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    // Call _fetchAndFilterMessages on initState
     _fetchAndFilterMessages();
   }
 
@@ -120,39 +119,46 @@ class _MessagesThreads extends State<MessagesThreads>
       body: Stack(
         children: [
           // Child container with rounded corners and gradient
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(45),
-                    topRight: Radius.circular(45),
-                  ),
-                  gradient: LinearGradient(
-                    colors: <Color>[
-                      Color.fromARGB(255, 229, 245, 227),
-                      Colors.white,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                  ),
+          
+          Padding(
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(45),
+                  topRight: Radius.circular(45),
+                ),
+                gradient: LinearGradient(
+                  colors: <Color>[
+                    Color.fromARGB(255, 229, 245, 227),
+                    Colors.white,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
             ),
           ),
 
           // TabBar positioned on top
-          Positioned(
-            top: 40.0,
-            left: 0.0,
-            right: 0.0,
-            child: TabBar(
-              controller: _tabController,
-              tabs: const [
-                Tab(text: 'Messages'),
-                Tab(text: 'Threads'),
-              ],
+          Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: Theme.of(context).colorScheme.copyWith(
+                surfaceVariant: Colors.transparent,
+              )
+            ),
+            child: Positioned(
+              top: 40.0,
+              left: 0.0,
+              right: 0.0,
+              child: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Messages'),
+                  Tab(text: 'Threads'),
+                ],
+                indicatorColor: Colors.red,
+              ),
             ),
           ),
 
@@ -168,6 +174,7 @@ class _MessagesThreads extends State<MessagesThreads>
               child: TabBarView(
                 controller: _tabController,
                 children: [
+
                   // Content for MESSAGES Tab
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -199,7 +206,6 @@ class _MessagesThreads extends State<MessagesThreads>
 
                                   return GestureDetector(
                                     onTap: () {
-                                      // Navigate to the next page with document data
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -209,7 +215,7 @@ class _MessagesThreads extends State<MessagesThreads>
                                             userDP: userDP.first,
                                             userId: userID.first,
                                             currentUserId: currentUser!.uid,
-                                          ), // Replace with your page class
+                                          ),
                                         ),
                                       );
                                     },
@@ -296,7 +302,7 @@ class _MessagesThreads extends State<MessagesThreads>
                                           ),
                                           SizedBox(
                                             //Contain Message last message time
-                                            width: 50,
+                                            width: 60,
                                             child: Container(
                                                 alignment: Alignment.center,
                                                 child: Text(
@@ -324,8 +330,6 @@ class _MessagesThreads extends State<MessagesThreads>
                       child: Text('Threads Content'),
                     ),
                   ),
-
-                  
                 ],
               ),
             ),

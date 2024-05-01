@@ -1,27 +1,4 @@
-import 'dart:math';
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:porao_app/common/all_import.dart';
-
-class Stack<E> {
-  final _list = <E>[];
-
-  void push(E value) => _list.add(value);
-
-  E pop() => _list.removeLast();
-
-  E get peek => _list.last;
-
-  bool get isEmpty => _list.isEmpty;
-  bool get isNotEmpty => _list.isNotEmpty;
-
-  @override
-  String toString() => _list.toString();
-
-  int length() => _list.length;
-}
 
 class AnswerPage extends StatefulWidget {
 
@@ -32,6 +9,7 @@ class AnswerPage extends StatefulWidget {
   final String questionTitle;
   final String privacyType;
   final Timestamp postTimestamp;
+  final String posterDP;
   final db = FirebaseFirestore.instance;
   final int voteCount;
 
@@ -45,6 +23,7 @@ class AnswerPage extends StatefulWidget {
     required this.privacyType,
     required this.postTimestamp,
     required this.voteCount,
+    required this.posterDP,
   }) : super(key: key);
 
   @override
@@ -115,72 +94,75 @@ class _AnswerPageState extends State<AnswerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+          backgroundColor: primaryColor,
+          elevation: 0,
+          toolbarHeight: 80,
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              size: 35,
+              color: Colors.white,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
+
+          actions: [
+            Row(
+              children: [
+                const Text(
+                  "POSTED BY",
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: Color.fromARGB(255, 214, 214, 214)),
+                ),
+
+                SizedBox(
+                  width: MediaQuery.of(context).size.width/2.0,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Text(
+                      widget.authorName,
+                      style: const TextStyle(
+                        fontSize: 25,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),   
+
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Text(
+                    formatTimeDifference(DateTime.now().difference(widget.postTimestamp.toDate())),
+                    style: TextStyle(
+                      fontFamily: primaryFont,
+                      color: const Color.fromARGB(255, 214, 214, 214),
+                      fontSize: Checkbox.width,
+                    ),
+                    textAlign: TextAlign.center, // Use TextAlign.bottomCenter
+                  ),
+                ),             
+              ],
+            )
+          ],
+        ),
+
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //...........................COLUMN CHILDRENS................//
-                Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.only(top: 60, bottom: 20),
-                    color: primaryColor,
-                    child: Row(
-                      children: [
-
-                        IconButton(
-                          icon: const Icon(
-                            Icons.arrow_back_ios_new,
-                            size: 35,
-                            color: Colors.white,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-
-                        const Text(
-                          "POSTED BY",
-                          style: TextStyle(
-                              fontSize: 15,
-                              color: Color.fromARGB(255, 214, 214, 214)),
-                        ),
-
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width/2.0,
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: Text(
-                              widget.authorName,
-                              style: const TextStyle(
-                                fontSize: 25,
-                                color: Colors.white,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
-
-                        Text(
-                          formatTimeDifference(DateTime.now().difference(widget.postTimestamp.toDate())),
-                          style: TextStyle(
-                            fontFamily: primaryFont,
-                            color: const Color.fromARGB(255, 214, 214, 214),
-                            fontSize: Checkbox.width,
-                          ),
-                          textAlign: TextAlign.center, // Use TextAlign.bottomCenter
-                        ),
-                      ],
-                    )
-                  ),
-            
-                //const SizedBox(height: 10),
+                //...........................COLUMN CHILDRENS................//                
             
                 Container(
                   //........QUESTION TITLE.......//
             
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
-                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                  margin: const EdgeInsets.fromLTRB(10, 20, 10, 0),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(10),
@@ -226,7 +208,7 @@ class _AnswerPageState extends State<AnswerPage> {
                 Container(
                   //...........MAIN COMMENT,UPVOTE, DOWNVOTE, SHARE .........//
                   width: double.infinity,
-                  margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                   decoration: BoxDecoration(
                     color: primaryColor, // Adjust the color as needed
                     borderRadius: BorderRadius.circular(10),
@@ -354,6 +336,9 @@ class _AnswerPageState extends State<AnswerPage> {
                                                           'totalReplies': 0,
                                                         },
                                                     );
+
+                                                    addToThreadsList(commentContent);
+
                                                     commentController.clear();
                                                   } catch (error) {
                                                     print(
@@ -406,6 +391,7 @@ class _AnswerPageState extends State<AnswerPage> {
                                 neutralVote();
                               }
                             });
+
             
                             if (vote == 0) {
                               docRef.update({
@@ -534,7 +520,7 @@ class _AnswerPageState extends State<AnswerPage> {
                                 width: double.infinity,
                                 height: 150,
                                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                                margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                margin: const EdgeInsets.fromLTRB(10, 20, 10, 10),
                                 decoration: const BoxDecoration(
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(10),
@@ -793,6 +779,8 @@ class _AnswerPageState extends State<AnswerPage> {
                                       updatePost.update({
                                         "answerCount": FieldValue.increment(1),
                                       });
+
+                                      addToThreadsList(replyContent);
                                                 
                                       commentController.clear();
                                     } catch (error) {
@@ -825,7 +813,7 @@ class _AnswerPageState extends State<AnswerPage> {
         ),
 
 
-        IconButton(
+        IconButton( //...................for UPVOTE...................//
           onPressed: () async {
             DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID).collection('answers').doc(curDocID);                          
 
@@ -873,8 +861,7 @@ class _AnswerPageState extends State<AnswerPage> {
           width: 10,
         ),
               
-        // -----------------------------------------------------------------Downvote Button
-        IconButton(
+        IconButton(//...................for DOWNVOTE...................//
           onPressed: () async {
             DocumentReference docRef = FirebaseFirestore.instance.collection('posts').doc(widget.postID).collection('answers').doc(curDocID);                   
 
@@ -912,7 +899,7 @@ class _AnswerPageState extends State<AnswerPage> {
     return Container(  //............CONTAINS INDIVIDUAL REPLIES........//
       width: double.infinity,
       padding: forPadding == 0.0 ? const EdgeInsets.fromLTRB(20, 20, 20, 20) : const EdgeInsets.fromLTRB(20, 0, 0, 0), //level wise padding
-      margin: forPadding == 0.0 ? const EdgeInsets.fromLTRB(10, 0, 10, 10) : const EdgeInsets.all(0.0), //level wise margin
+      margin: forPadding == 0.0 ? const EdgeInsets.fromLTRB(10, 20, 10, 0) : const EdgeInsets.all(0.0), //level wise margin
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(
           Radius.circular(10),
@@ -1142,4 +1129,81 @@ class _AnswerPageState extends State<AnswerPage> {
 
       });
   }
+
+  Future addToThreadsList (String latestReply) async {
+
+    final CollectionReference threadsRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .collection('threads');
+
+    final collectionExists = await threadsRef.get().then((snapshot) {
+      return snapshot.size > 0;
+      }
+    );
+
+    List<dynamic> upvote, downvote;
+    int voteCounter = 0, upvoteCount = 0, downvoteCount = 0;
+    final docSnapshot = await widget.db.collection('posts').doc(widget.postID).get();
+    
+    if (docSnapshot.exists) {
+      final postData = docSnapshot.data() as Map<String, dynamic>;
+      upvote = postData['upvotes'];
+      downvote = postData['downvotes'];
+      upvoteCount = upvote.length;
+      downvoteCount = downvote.length;
+      voteCounter = upvoteCount - downvoteCount;
+    } else {
+      print("Snapshot data not found");
+    }
+
+    DocumentReference userThreadsUpdate = FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser?.uid)
+      .collection('threads')
+      .doc(widget.postID);                   
+
+    if(collectionExists) {
+      final docRef = threadsRef.doc(widget.postID);
+      final docExists = await docRef.get().then((snapshot) => snapshot.exists);
+
+
+      if (docExists) { //................If reply to post exists, REPLACES by new comment..........//
+        userThreadsUpdate.update({
+          'userLatestReply': latestReply,
+          'userReplyTime': FieldValue.serverTimestamp(),
+          'voteCount': voteCounter,
+        });
+      } else {
+        await threadsRef.doc(widget.postID).set({ //.......Create NEW COMMENT reference.........//
+          'title': widget.questionTitle,
+          'content': widget.questionContent,
+          'createdAt': widget.postTimestamp,
+          'authorID': widget.authorID,
+          'authorName': widget.authorName,
+          'dp-url': widget.posterDP,
+          'privacy': widget.privacyType,
+          'voteCount': voteCounter,
+          'userLatestReply': latestReply,
+          'userReplyTime': FieldValue.serverTimestamp(),
+        });
+      }
+    } else {
+      await threadsRef.doc(widget.postID).set({ //.......Create NEW COMMENT reference.........//
+        'title': widget.questionTitle,
+        'content': widget.questionContent,
+        'createdAt': widget.postTimestamp,
+        'authorID': widget.authorID,
+        'authorName': widget.authorName,
+        'dp-url': widget.posterDP,
+        'privacy': widget.privacyType,
+        'voteCount': voteCounter,
+        'userLatestReply': latestReply,
+        'userReplyTime': FieldValue.serverTimestamp(),
+      });
+    }
+
+    return Container();
+  }
+
 }
