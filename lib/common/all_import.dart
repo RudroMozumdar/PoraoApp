@@ -22,7 +22,7 @@ export 'package:porao_app/dashboard/messages_threads.dart';
 export 'package:porao_app/dashboard/chat_page.dart';
 export 'package:porao_app/dashboard/my_posts.dart';
 export 'package:porao_app/dashboard/create_post.dart';
-export 'package:porao_app/dashboard/answer_page.dart' hide Stack;
+export 'package:porao_app/dashboard/answer_page.dart';
 
 export 'package:porao_app/common/fonts.dart';
 export 'package:porao_app/common/colors.dart';
