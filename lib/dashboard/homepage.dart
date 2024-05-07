@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class HomePage extends StatefulWidget {
@@ -201,7 +199,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           // Image
                           GestureDetector(
-                            onTap: (){},
+                            onTap: () {},
                             child: CircleAvatar(
                               radius: 25,
                               backgroundImage: NetworkImage(post['dp-url']),
@@ -214,23 +212,20 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-
                                 SizedBox(
-                                  width: MediaQuery.of(context).size.width/2.0,
-                                  child: GestureDetector(
-                                    onTap: (){}, 
-                                    child: Text(
-                                      post['authorName'],
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontFamily: primaryFont,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  )
-                                ),
-
+                                    width:
+                                        MediaQuery.of(context).size.width / 2.0,
+                                    child: GestureDetector(
+                                        onTap: () {},
+                                        child: Text(
+                                          post['authorName'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: primaryFont,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ))),
                                 Text(
                                   formatTimeDifference(DateTime.now()
                                       .difference(timestamp.toDate())),
@@ -268,123 +263,123 @@ class _HomePageState extends State<HomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        IconButton(
+                          //................... Comment Button
+                          onPressed: () {
+                            // Get the question data (replace with your actual way of accessing data)
+                            final String docID = post.id;
+                            final String authorName = post['authorName'];
+                            final String authorID = post['authorId'];
+                            final String content = post['content'];
+                            final String title = post['title'];
+                            final String privacy = post['privacy'];
+                            final timestamp = post['createdAt'] as Timestamp;
+                            final String posterDP = post['dp-url'];
 
-                        IconButton( //................... Comment Button
-                                onPressed: () {
-                                  // Get the question data (replace with your actual way of accessing data)
-                                  final String docID = post.id;
-                                  final String authorName = post['authorName'];
-                                  final String authorID = post['authorId'];
-                                  final String content = post['content'];
-                                  final String title = post['title'];
-                                  final String privacy = post['privacy'];
-                                  final timestamp = post['createdAt'] as Timestamp;
-                                  final String posterDP = post['dp-url'];
-                            
-                                  // Navigate to the AnswerPage with data
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => AnswerPage(
-                                          postID: docID,
-                                          authorName: authorName,
-                                          authorID: authorID,
-                                          questionContent: content,
-                                          questionTitle: title,
-                                          privacyType: privacy,
-                                          postTimestamp: timestamp,
-                                          voteCount: vote,
-                                          posterDP: posterDP,
-                                      ),                                    
-                                    ),
-                                  );
-                                },
-                                icon: const Icon(Icons.comment),
-                              ),
-
-                        
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  if (vote == 0) {
-                                    docRef.update({
-                                      'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
-                                    });
-                                  } else if (vote == -1) {
-                                    docRef.update({
-                                      'downvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
-                                    });
-                                    docRef.update({
-                                      'upvotes': FieldValue.arrayUnion([Auth().currentUser?.uid]),
-                                    });
-                                  } else {
-                                    docRef.update({
-                                      'upvotes': FieldValue.arrayRemove([Auth().currentUser?.uid]),
-                                    });
-                                  }
-                                },
-                                icon: const Icon(Icons.arrow_upward_rounded),
-                                tooltip: 'Upvote',
-                                color: vote == 1 ? Colors.blue : Colors.black,
-                              ), // Added missing closing curly brace here
-
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              
-                              Container(
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: primaryColor,
-                                ),
-
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(
-                                    (post['upvotes'].length - post['downvotes'].length).toString(), // Total Vote count
-                                  ),
+                            // Navigate to the AnswerPage with data
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AnswerPage(
+                                  postID: docID,
+                                  authorName: authorName,
+                                  authorID: authorID,
+                                  questionContent: content,
+                                  questionTitle: title,
+                                  privacyType: privacy,
+                                  postTimestamp: timestamp,
+                                  voteCount: vote,
+                                  posterDP: posterDP,
                                 ),
                               ),
-                              
-                              const SizedBox(
-                                width: 25,
-                              ),
-                                  // -----------------------------------------------------------------Downvote Button
-                                IconButton(
-                                  onPressed: () {
-                                    if (vote == 0) {
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else if (vote == 1) {
-                                      docRef.update({
-                                        'upvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayUnion(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    } else {
-                                      docRef.update({
-                                        'downvotes': FieldValue.arrayRemove(
-                                            [Auth().currentUser?.uid])
-                                      });
-                                    }
-                                  },
-                                  icon: const Icon(Icons.arrow_downward_rounded),
-                                  tooltip: 'Downvote',
-                                  color: vote == -1 ? Colors.blue : Colors.black,
-                                ),
-                              ],
+                            );
+                          },
+                          icon: const Icon(Icons.comment),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                if (vote == 0) {
+                                  docRef.update({
+                                    'upvotes': FieldValue.arrayUnion(
+                                        [Auth().currentUser?.uid]),
+                                  });
+                                } else if (vote == -1) {
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayRemove(
+                                        [Auth().currentUser?.uid]),
+                                  });
+                                  docRef.update({
+                                    'upvotes': FieldValue.arrayUnion(
+                                        [Auth().currentUser?.uid]),
+                                  });
+                                } else {
+                                  docRef.update({
+                                    'upvotes': FieldValue.arrayRemove(
+                                        [Auth().currentUser?.uid]),
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.arrow_upward_rounded),
+                              tooltip: 'Upvote',
+                              color: vote == 1 ? Colors.blue : Colors.black,
+                            ), // Added missing closing curly brace here
+
+                            const SizedBox(
+                              width: 25,
                             ),
-                          
-                            
-                          
+
+                            Container(
+                              clipBehavior: Clip.antiAlias,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: primaryColor,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  (post['upvotes'].length -
+                                          post['downvotes'].length)
+                                      .toString(), // Total Vote count
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(
+                              width: 25,
+                            ),
+                            // -----------------------------------------------------------------Downvote Button
+                            IconButton(
+                              onPressed: () {
+                                if (vote == 0) {
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayUnion(
+                                        [Auth().currentUser?.uid])
+                                  });
+                                } else if (vote == 1) {
+                                  docRef.update({
+                                    'upvotes': FieldValue.arrayRemove(
+                                        [Auth().currentUser?.uid])
+                                  });
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayUnion(
+                                        [Auth().currentUser?.uid])
+                                  });
+                                } else {
+                                  docRef.update({
+                                    'downvotes': FieldValue.arrayRemove(
+                                        [Auth().currentUser?.uid])
+                                  });
+                                }
+                              },
+                              icon: const Icon(Icons.arrow_downward_rounded),
+                              tooltip: 'Downvote',
+                              color: vote == -1 ? Colors.blue : Colors.black,
+                            ),
+                          ],
+                        ),
                         IconButton(
                           onPressed: () {},
                           icon: const Icon(
@@ -392,8 +387,8 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.black,
                           ),
                         ),
-                      ],                      
-                    ),                    
+                      ],
+                    ),
                   ],
                 ),
               ),

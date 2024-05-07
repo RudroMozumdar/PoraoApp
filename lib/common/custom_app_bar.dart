@@ -20,7 +20,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(25))),
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(25),
+        ),
+      ),
       backgroundColor: primaryColor,
       leading: IconButton(
         onPressed: () {

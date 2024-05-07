@@ -1,27 +1,54 @@
+import 'dart:math';
+
 import 'package:porao_app/common/all_import.dart';
 
-class PersonalDetails extends StatefulWidget {
-  const PersonalDetails({super.key});
+class PublicProfile extends StatefulWidget {
+  const PublicProfile({super.key});
 
   @override
-  State<PersonalDetails> createState() => _PersonalDetailsState();
+  State<PublicProfile> createState() => _PublicProfileState();
 }
 
-class _PersonalDetailsState extends State<PersonalDetails> {
+class _PublicProfileState extends State<PublicProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Personal Details'),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          coverAndDP(),
-          names(),
-          actions(),
-          deviderWithShadow(),
-          review(),
-          deviderWithShadow(),
-        ],
+      appBar: AppBar(
+        title: Text(
+          'Rudro Mozumdar',
+          style: TextStyle(
+            fontFamily: primaryFont,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: primaryColor,
+        leading: IconButton(
+          onPressed: () {
+            currentTab = 0;
+            pageController.animateToPage(
+              currentTab,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.fastEaseInToSlowEaseOut,
+            );
+          },
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            coverAndDP(),
+            names(),
+            actions(),
+            deviderWithShadow(),
+            review(),
+            deviderWithShadow(),
+            experties(),
+          ],
+        ),
       ),
     );
   }
@@ -84,54 +111,33 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 ],
               ),
             ),
-            // Show Pulic Profile-----------------------------------------------------------
+            // -------------------------------------------------------- Message
             Align(
               alignment: Alignment.bottomRight,
               child: Padding(
-                padding: const EdgeInsets.only(top: 135, right: 5),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return const PublicProfile();
-                    }));
-                  },
-                  child: Container(
-                    width: 170,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: primaryColor,
+                  padding: const EdgeInsets.only(top: 135, right: 5),
+                  child: GestureDetector(
+                    child: Container(
+                      height: 40,
+                      width: 120,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.green,
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.message_rounded, color: Colors.white),
+                          Text(
+                            " MESSAGE",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(
-                            top: 5,
-                            right: 5,
-                            bottom: 5,
-                          ),
-                          child: Icon(
-                            Icons.remove_red_eye,
-                            color: Colors.white,
-                            size: 17,
-                          ),
-                        ),
-                        Text(
-                          "Show Public Profile",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: const Color.fromARGB(255, 255, 255, 255),
-                            fontFamily: primaryFont,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+                    onTap: () {},
+                  )),
             ),
           ],
         ),
@@ -348,47 +354,24 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     );
   }
 
+  Widget experties() {
+    return const Placeholder();
+  }
+
   Widget deviderWithShadow() {
     return Column(
       children: [
-        Container(
-          height: 3,
-          width: double.infinity,
-          color: Colors.grey[800],
-        ),
+        // Container(
+        //   height: 3,
+        //   width: double.infinity,
+        //   color: Colors.grey[800],
+        // ),
         Container(
           height: 5,
           width: double.infinity,
-          color: Colors.grey[700],
+          color: Colors.black,
         ),
       ],
     );
   }
-
-  // void messageCreater(BuildContext context, String profileUserId) async {
-
-  //   final String curUserId = FirebaseAuth.instance.currentUser!.uid;
-
-  //   final List<String> userIds = [curUserId, profileUserId];
-
-  //   final Stream<QuerySnapshot> existingMessages = FirebaseFirestore.instance
-  //       .collection('messages')
-  //       .where('user1id', whereIn: userIds)
-  //       .where('user2id', whereIn: userIds)
-  //       .snapshots();
-
-  //   await for (final snapshot in existingMessages) {
-  //     if (snapshot.docs.isNotEmpty) {
-  //       final messageData = snapshot.docs.first.data();
-  //       return;
-  //     }
-  //   }
-
-  //   final docRef = FirebaseFirestore.instance.collection('messages').doc();
-  //   await docRef.set({
-  //     'user1id': curUserId,
-  //     'user2id': profileUserId,
-  //   });
-
-  // }
 }
