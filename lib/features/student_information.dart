@@ -39,7 +39,7 @@ class _StudentInformationState extends State<StudentInformation> {
                       borderRadius:
                           const BorderRadius.vertical(top: Radius.circular(30)),
                       child: Image.asset(
-                        "assets/images/masud_high_quality.png",
+                        "assets/images/masud.jpg",
                       ),
                     ),
                     const Padding(

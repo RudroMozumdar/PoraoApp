@@ -109,11 +109,12 @@ class _AnswerPageState extends State<AnswerPage> {
 
           actions: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 const Text(
                   "POSTED BY",
                   style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 12,
                       color: Color.fromARGB(255, 214, 214, 214)),
                 ),
 
@@ -226,7 +227,6 @@ class _AnswerPageState extends State<AnswerPage> {
                             isScrollControlled: true,
                             builder: (context) => Container(
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
                                 color: primaryColor,
                               ),
                               padding: EdgeInsets.only(
@@ -243,18 +243,18 @@ class _AnswerPageState extends State<AnswerPage> {
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
 
-                                      IconButton(       //.............Keyboard ATTACHMENT Button
-                                        onPressed: (){}, 
-                                        icon: const Icon(Icons.attach_file_outlined, size: 30,),
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
-                                          shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                                            RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(45.0),
-                                            )
-                                          ),
-                                        ),
-                                      ),
+                                      // IconButton(       //.............Keyboard ATTACHMENT Button
+                                      //   onPressed: (){}, 
+                                      //   icon: const Icon(Icons.attach_file_outlined, size: 30,),
+                                      //   style: ButtonStyle(
+                                      //     backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                                      //     shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                                      //       RoundedRectangleBorder(
+                                      //         borderRadius: BorderRadius.circular(45.0),
+                                      //       )
+                                      //     ),
+                                      //   ),
+                                      // ),
 
                                       const SizedBox(
                                         width: 10,

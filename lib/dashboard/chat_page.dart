@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
+import 'package:porao_app/dashboard/whiteboard.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class ChatPage extends StatefulWidget {
@@ -26,13 +28,17 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPage extends State<ChatPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool showWhiteboard = false;
   Timer? _timer;
+  File? _selectedImage;
   
   @override
   void dispose() {
     _timer?.cancel();
     super.dispose();
   }
+
+  //final AgoraClient
 
   Future<List<Map<String, dynamic>>> fetchMessageList() async {
     final collectionRef = _firestore
@@ -97,19 +103,19 @@ class _ChatPage extends State<ChatPage> {
               children: [
                 CircleAvatar(
                   radius: 23,
-                  backgroundImage: NetworkImage(widget.userDP),
+                  backgroundImage: NetworkImage(widget.userDP), //Reciever DP
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.45,
                   child: Text(
-                    "  ${widget.userName}",
+                    "  ${widget.userName}",                     // Reciever NAME
                     style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
 
-            IconButton(       //.............Keyboard ATTACHMENT Button
+            IconButton(       //.............CALL Button
               onPressed: (){}, 
               icon: const Icon(Icons.call, size: 30,),
               style: ButtonStyle(
@@ -222,23 +228,25 @@ class _ChatPage extends State<ChatPage> {
       decoration: BoxDecoration(
         color: primaryColor,
       ),
-      padding: const EdgeInsets.all(10.0), // Adjust padding as needed
+      padding: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
 
-          IconButton(       //.............Keyboard ATTACHMENT Button
-            onPressed: (){}, 
-            icon: const Icon(Icons.attach_file_outlined, size: 30,),
-            style: ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
-              shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(45.0),
-                )
-              ),
-            ),
-          ),
+          // IconButton(       //.............Keyboard ATTACHMENT Button
+          //   onPressed: (){
+          //     _pickImageFromGallery();
+          //   }, 
+          //   icon: const Icon(Icons.attach_file_outlined, size: 30,),
+          //   style: ButtonStyle(
+          //     backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+          //     shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+          //       RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.circular(45.0),
+          //       )
+          //     ),
+          //   ),
+          // ),
 
           const SizedBox(
             width: 10,
@@ -330,4 +338,43 @@ class _ChatPage extends State<ChatPage> {
       ),
     );
   }
+
+  Future _pickImageFromGallery() async {
+    final status = await Permission.storage.request();
+
+    if (status == PermissionStatus.granted) {
+      // Permission granted, proceed with picking the image
+      final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (returnedImage != null) {
+        setState(() {
+          _selectedImage = File(returnedImage.path);
+        });
+      }
+    } else if (status == PermissionStatus.permanentlyDenied) {
+      // Permission permanently denied, handle it
+      openAppSettings(); // Open app settings to allow permissions
+    } else {
+      print('Didnt work');
+    }
+  }
+
 }
+
+// class WhiteboardWidget extends StatelessWidget {
+//   final WhiteBoardController controller;
+
+//   const WhiteboardWidget({
+//     Key? key,
+//     required this.controller,
+//   }) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return WhiteBoard(
+//       backgroundColor: Colors.white,
+//       strokeColor: Colors.black,
+//       strokeWidth: 3,
+//       controller: controller,
+//     );
+//   }
+// }

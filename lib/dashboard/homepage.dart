@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          header("Rudro Mozumdar", "assets/images/rudro.jpg"),
+          header("Masud Hassan", "assets/images/masud.jpg"),
           createPostSection(context),
           feedText(),
           questions(context),

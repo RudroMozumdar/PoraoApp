@@ -37,7 +37,7 @@ class _ProfileState extends State<Profile> {
                     shape: BoxShape.circle,
                     image: DecorationImage(
                       image: AssetImage(
-                        "assets/images/masud_high_quality.png",
+                        "assets/images/masud.jpg",
                       ),
                     ),
                   ),

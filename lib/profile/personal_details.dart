@@ -15,6 +15,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+<<<<<<< Updated upstream
           coverAndDP(),
           names(),
           actions(),
@@ -52,6 +53,40 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                     decoration: BoxDecoration(
                       color: Colors.grey[900],
                       borderRadius: BorderRadius.circular(100),
+=======
+          // -----------------------------------------------------------------Images
+          Stack(
+            children: [
+              // --------------------------------------------------------Cover
+              const Image(
+                height: 130,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                image: AssetImage('assets/images/masud.jpg'),
+              ),
+              // -----------------------------------------------Display Picture Section
+              Container(
+                width: 100,
+                height: 100,
+                margin: const EdgeInsets.only(top: 80, left: 30),
+                child: Stack(
+                  children: [
+                    // ------------------------------------Display Picture
+                    Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[900],
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const ClipOval(
+                        child: Image(
+                          height: 90,
+                          width: 90,
+                          image: AssetImage('assets/images/masud.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+>>>>>>> Stashed changes
                     ),
                     child: const ClipOval(
                       child: Image(
@@ -218,6 +253,142 @@ class _PersonalDetailsState extends State<PersonalDetails> {
               ),
             ],
           ),
+<<<<<<< Updated upstream
+=======
+
+          // -----------------------------------------------------Names
+          Container(
+            padding: const EdgeInsets.only(left: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Masud Hassan',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: primaryFont,
+                        fontSize: 25,
+                      ),
+                    ),
+
+                    GestureDetector(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.green,
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.message_rounded, color: Colors.white),
+
+                            Text(" MESSAGE", style: TextStyle(color: Colors.white),),
+                          ],
+                        ),
+                      ),
+
+                      onTap: (){},
+                    )
+                  ],
+                ),
+                Text(
+                  'Student of North South University',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: primaryFont,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'North South University',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: primaryFont,
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  'Dhala, Bangladesh',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontFamily: primaryFont,
+                    fontSize: 13,
+                  ),
+                ),
+                // -----------------------------------------------------Reviews
+                Row(
+                  children: [
+                    Text(
+                      '4.7 ',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontFamily: primaryFont,
+                        fontSize: 13,
+                      ),
+                    ),
+                    Icon(
+                      Icons.star,
+                      size: 13,
+                      color: primaryColor,
+                    ),
+                    Container(
+                      height: 3,
+                      width: 3,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                          color: primaryButtonColor,
+                          borderRadius: BorderRadius.circular(5)),
+                    ),
+                    Text(
+                      '10 Conversation Started',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontFamily: primaryFont,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          // -------------------------------------------------Actions
+          Container(
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // send msg here
+                  },
+                  icon: Icon(
+                    Icons.message,
+                    color: primaryColor,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.heart_broken),
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.heart_broken),
+                ),
+              ],
+            ),
+          )
+>>>>>>> Stashed changes
         ],
       ),
     );
