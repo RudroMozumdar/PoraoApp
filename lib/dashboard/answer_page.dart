@@ -581,28 +581,36 @@ class _AnswerPageState extends State<AnswerPage> {
                                     physics: const NeverScrollableScrollPhysics(),
                                     itemCount: documents.length,
                                     itemBuilder: (context, index) {
+
                                       final data = documents[index].data()! as Map<String, dynamic>;
-                                      DocumentSnapshot comment = documents[index];
-                                      String curDocID = comment.id;
-                                      final String content = data['content'];
-                                      final String dpURL = data['dp-url'];
-                                      final String author = data['authorName'];
-                                      final timeOfCreation = data['createdAt'] as Timestamp;
-                                      final int level = data['level'];
-                                      double newLevel = level + 0.0;
-                                      newLevel *= 10;
-            
-                                      int votes = 0;
-            
-                                      // Check if user has already voted
-                                      if (data['upvotes'].contains(Auth().currentUser?.uid)) {
-                                        votes = 1;
-                                      } else if (data['downvotes']
-                                          .contains(FirebaseAuth.instance.currentUser?.uid)) {
-                                        votes = -1;
-                                      }
-            
-                                      return buildReplyBox(dpURL, author, timeOfCreation, content, context, curDocID, newLevel, votes);
+
+                                      if (data['createdAt'] != null) {                                      
+                                        DocumentSnapshot comment = documents[index];
+                                        String curDocID = comment.id;
+                                        final String content = data['content'];
+                                        final String dpURL = data['dp-url'];
+                                        final String author = data['authorName'];
+                                        final timeOfCreation = data['createdAt'] as Timestamp;
+
+                                        final int level = data['level'];
+                                        double newLevel = level + 0.0;
+                                        newLevel *= 10;
+              
+                                        int votes = 0;
+              
+                                        // Check if user has already voted
+                                        if (data['upvotes'].contains(Auth().currentUser?.uid)) {
+                                          votes = 1;
+                                        } else if (data['downvotes']
+                                            .contains(FirebaseAuth.instance.currentUser?.uid)) {
+                                          votes = -1;
+                                        }
+
+                                        return buildReplyBox(dpURL, author, timeOfCreation, content, context, curDocID, newLevel, votes);
+                                      } else {
+                                        print('Field "createdAt" not found in document data');
+                                      }    
+                                      return Container();
                                     },
                                   );
                               }
@@ -1023,7 +1031,8 @@ class _AnswerPageState extends State<AnswerPage> {
                             final String content = childData['content'];
                             final String dpURL = childData['dp-url'];
                             final String author = childData['authorName'];
-                            final timeOfCreation = childData['createdAt'] as Timestamp;
+                            final create = childData['createdAt'];
+                            final timeOfCreation = create as Timestamp;
                             final int level = childData['level'];
                             double newLevel = level + 0.0;
                             newLevel *= 10;

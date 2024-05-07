@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:porao_app/common/all_import.dart';
 
@@ -20,6 +21,8 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
 
   late Timer _refreshTimer;
 
+  int _selectedIndex = 0;
+
   Future<void> _fetchAndFilterMessages() async {
     filteredDocuments = await fetchAndFilterByUserId(currentUser!.uid);
     setState(() {});
@@ -28,11 +31,30 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
   String _formatTimestampForDisplay(dynamic timestampValue) {
     Timestamp firebaseTimestamp = timestampValue as Timestamp;
     DateTime dateTime = firebaseTimestamp.toDate();
+    DateTime now = DateTime.now();
 
-    // Define the desired format pattern
-    final formattedDate = DateFormat('h:mm a, d MMM, yyyy').format(dateTime);
+    // difference in days
+    int differenceInDays = now.difference(dateTime).inDays;
+
+    // format pattern based on difference in days
+    String formattedDate;
+    if (differenceInDays == 0) {
+      //within Today
+      formattedDate = DateFormat('h:mm a').format(dateTime);
+    } else if (differenceInDays == 1) {
+      // at least Yesterday
+      formattedDate = 'Yesterday\n ${DateFormat('h:mm a').format(dateTime)}';
+    } else if (differenceInDays < 7) {
+      // Within a week, show weekday abbreviation
+      formattedDate = '${DateFormat('EEE').format(dateTime)}, ${DateFormat('h:mm a').format(dateTime)}';
+    } else {
+      // More than a week, show full date
+      formattedDate = DateFormat('d MMM, yyyy').format(dateTime);
+    }
+
     return formattedDate;
   }
+
 
   Future<List<Map<String, dynamic>>> fetchAndFilterByUserId(
     String currentUserId,
@@ -98,6 +120,11 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _selectedIndex = _tabController.index;
+      });
+    });
     _fetchAndFilterMessages();
   }
 
@@ -108,27 +135,33 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
     super.dispose();
   }
 
+  void _handleTabChange() {
+    if (_selectedIndex == 1) { // Check for "MESSAGES" tab index (usually 1)
+      _refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+        _fetchAndFilterMessages();
+      });
+    } else {
+      _refreshTimer.cancel(); // Cancel timer if not on "MESSAGES" tab
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      _fetchAndFilterMessages();
-    });
+    //_tabController.addListener(_handleTabChange);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Child container with rounded corners and gradient
           
           Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+            padding: const EdgeInsets.all(20),
             child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(45),
-                  topRight: Radius.circular(45),
-                ),
-                gradient: LinearGradient(
+              padding: const EdgeInsets.only(top: 20, bottom: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(45),
+                border: Border.all(width: 1, color: const Color.fromARGB(255, 229, 245, 227)),
+                gradient: const LinearGradient(
                   colors: <Color>[
                     Color.fromARGB(255, 229, 245, 227),
                     Colors.white,
@@ -137,201 +170,467 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                   end: Alignment.bottomCenter,
                 ),
               ),
-            ),
-          ),
-
-          // TabBar positioned on top
-          Theme(
-            data: Theme.of(context).copyWith(
-              colorScheme: Theme.of(context).colorScheme.copyWith(
-                surfaceVariant: Colors.transparent,
-              )
-            ),
-            child: Positioned(
-              top: 40.0,
-              left: 0.0,
-              right: 0.0,
-              child: TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Messages'),
-                  Tab(text: 'Threads'),
-                ],
-                indicatorColor: Colors.red,
-              ),
-            ),
-          ),
-
-          // Content relative to each tab bar
-          Positioned(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 110,
-                right: 40,
-                left: 40,
-                bottom: 20,
-              ),
-              child: TabBarView(
-                controller: _tabController,
+              child: Column(
                 children: [
 
-                  // Content for MESSAGES Tab
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(45.0),
-                        border: Border.all(width: 2, color: primaryColor)),
-                    child: filteredDocuments == null
-                        ? const Center(child: Text('Loading messages...'))
-                        : (filteredDocuments!.isEmpty)
-                            ? const Center(
-                                child: Text('No matching messages found.'))
-                            : ListView.separated(
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 10.0),
-                                itemCount: filteredDocuments!.length,
-                                itemBuilder: (context, index) {
-                                  final doc = filteredDocuments![index];
-                                  //
-                                  //DateTime import and parsing
-                                  String formattedTimestamp =
-                                      _formatTimestampForDisplay(
-                                          doc['last_time']);
-                                  //
-                                  //
-                                  final messageUser = filterMessageUsers(doc);
-                                  final userDP = filterUserDpUrl(doc);
-                                  final userID = filterUserId(doc);
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                        surfaceVariant: Colors.transparent,
+                      )
+                    ),
+                    child: TabBar(
+                      controller: _tabController,
+                      tabs: [
 
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatPage(
-                                            docID: doc['id'].toString(),
-                                            userName: messageUser.first,
-                                            userDP: userDP.first,
-                                            userId: userID.first,
-                                            currentUserId: currentUser!.uid,
-                                          ),
+                        //...................THREADS TAB HEADING.................//
+                        Tab(
+                          child: Container(
+                            padding: _selectedIndex == 0 ? const EdgeInsets.all(5) : const EdgeInsets.all(0), 
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(45),
+                              color: primaryColor,
+                            ),
+                            child: _selectedIndex == 0 
+                              ? Container(
+                                padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(width: 3, color: Colors.white),
+                                  borderRadius: BorderRadius.circular(45)
+                                ),
+                                child: const Center(
+                                  child: Text(
+                                    "Threads",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white
+                                    ),  
+                                  ),
+                                ),
+                              ) 
+                            : const Center(
+                              child: Text(
+                                "Threads",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white
+                                ),  
+                              ),
+                            ),
+                          )
+                        ),
+                    
+                        //...................MESSAGES TAB HEADING.................//
+                        Tab(
+                          child: Container(
+                            padding: _selectedIndex == 1 ? const EdgeInsets.all(5) : const EdgeInsets.all(0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(45),
+                              color: primaryColor
+                            ),
+                            child: _selectedIndex == 1 
+                            ? Container(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 3, color: Colors.white),
+                                borderRadius: BorderRadius.circular(45)
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Messages",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white
+                                  ),  
+                                ),
+                              ),
+                            )
+                            : const Center(
+                              child: Text(
+                                "Messages",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.white
+                                ),  
+                              ),
+                            ),
+                          )
+                        ),
+                      ],
+                      indicatorColor: Colors.transparent,
+                    ),
+                  ),
+
+                  
+                ],
+              ),
+            ),
+          ),
+
+          
+          Container(
+            padding: const EdgeInsets.only(
+              top: 110,
+              right: 40,
+              left: 40,
+              bottom: 40,
+            ),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                
+                //.............. Content for THREADS tab...............//
+          
+                SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Container(
+                    
+                    decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(45.0),
+                    ),
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(FirebaseAuth.instance.currentUser?.uid)
+                        .collection('threads')
+                        .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+                            
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          default:
+                            final documents = snapshot.data!.docs;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: documents.length,
+                              itemBuilder: (context, index) {
+                                final data = documents[index].data()! as Map<String, dynamic>;
+                                DocumentSnapshot comment = documents[index];
+                                String curDocID = comment.id;
+                                String dp = data['dp-url'];
+                                String authName = data['authorName'];
+                                String title = data['title'];
+                                String content = data['content'];
+                                String latestReply = data['userLatestReply'];
+                                String authID = data['authorID'];
+                                String privacy = data['privacy'];
+                                Timestamp createdAt = data['createdAt'] as Timestamp;
+                                int votecount = data['voteCount'];
+                                 
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AnswerPage(
+                                          postID: curDocID,
+                                          authorName: authName,
+                                          authorID: authID,
+                                          questionContent: content,
+                                          questionTitle: title,
+                                          privacyType: privacy,
+                                          postTimestamp: createdAt,
+                                          posterDP: dp,
+                                          voteCount: votecount,
                                         ),
-                                      );
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.only(
-                                        top: 7,
-                                        bottom: 7,
                                       ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(45.0),
-                                        border: Border.all(
-                                            width: 2, color: Colors.black),
-                                      ),
-                                      height: 80,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          SizedBox(
-                                            //Contains User DP
-                                            width: 50,
-                                            child: CircleAvatar(
-                                              radius: 25,
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                    margin: const EdgeInsets.only(bottom: 20),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(width: 2, color: primaryColor),
+                                      borderRadius: BorderRadius.circular(25) ,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                  
+                                        Row(
+                                          children: [
+                            
+                                            CircleAvatar(                                     //......POSTER DP..........//
+                                              foregroundColor: Colors.purple,
+                                              radius:20,
                                               backgroundImage: NetworkImage(
-                                                  userDP.isEmpty
-                                                      ? '$userDP'
-                                                      : userDP.join(' ')),
+                                                dp
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                            child: Container(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            //Contain Message info
-                                            width: 150,
-                                            child: Column(
+                            
+                                            SizedBox(width: MediaQuery.of(context).size.width * 0.02), 
+                            
+                                            Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Container(
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  child: Text(
-                                                    messageUser.isEmpty
-                                                        ? '$messageUser'
-                                                        : messageUser.join(' '),
-                                                    style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                    ),
-                                                  ),
-                                                ),
+                  
                                                 SizedBox(
-                                                  height: 13,
-                                                  child: Container(
-                                                    color: Colors.white,
+                                                  width: MediaQuery.of(context).size.width * 0.5,
+                                                  child: Text(                              //........ NAME OF AUTHOR ........//
+                                                      authName,
+                                                      style: const TextStyle(
+                                                        fontSize: 18.5,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      textAlign: TextAlign.left,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                ),
+                                                
+                                                Text(                                       //.......ORIGINAL POST TIME........//
+                                                  formatTimeDifference(
+                                                    DateTime.now()
+                                                        .difference(
+                                                            (data['createdAt'] as Timestamp).toDate()
+                                                      )
+                                                  ),
+                                                  style: TextStyle(
+                                                    fontFamily: primaryFont,
+                                                    color: Colors.grey,
+                                                    fontSize: 13
                                                   ),
                                                 ),
-                                                Container(
-                                                  alignment:
-                                                      Alignment.bottomLeft,
-                                                  child: Text(
-                                                    '${doc['last_msg'] ?? '---'}',
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                )
                                               ],
                                             ),
-                                          ),
-                                          SizedBox(
-                                            width: 10,
-                                            child: Container(
-                                              color: Colors.white,
+                            
+                                          ],
+                                        ),
+                            
+                                        SizedBox(height: MediaQuery.of(context).size.width * 0.03,),
+                            
+                                        Row(
+                                          children: [
+                                            SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                                            
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width * 0.66,
+                                              child: Text(  //.................... TITLE of original question ........//
+                                                  title,
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
                                             ),
-                                          ),
-                                          SizedBox(
-                                            //Contain Message last message time
-                                            width: 60,
-                                            child: Container(
-                                                alignment: Alignment.center,
-                                                child: Text(
+                                          ],
+                                        ),
+                            
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                            
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
+                                                
+                                                const Icon(Icons.subdirectory_arrow_right, size: 30, opticalSize: 70,),
+                                                
+                                                SizedBox(
+                                                  width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(  //.................... Reply of current User ........//
+                                                    latestReply, 
+                                                    style: const TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.normal,
+                                                    ),
+                                                    textAlign: TextAlign.left,
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                
+                                                const Text("(Me)", style: TextStyle(color: Colors.grey),),
+                                              ],
+                                            ),
+                            
+                                            Text(
+                                              formatTimeDifference(
+                                                DateTime.now()
+                                                    .difference(
+                                                        (data['userReplyTime'] as Timestamp).toDate()
+                                                  )
+                                              ),
+                                              style: TextStyle(
+                                                fontFamily: primaryFont,
+                                                color: Colors.grey,
+                                                fontSize: 13
+                                              ),
+                                            ),
+                                          ],
+                            
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                        }
+                      },
+                    ),
+                  ),
+                ),
+                
+                // Content for MESSAGES Tab
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(45.0),
+                    border: Border.all(width: 2, color: primaryColor)
+                  ),
+                  child: filteredDocuments == null
+                      ? const Center(child: Text('Loading messages...'))
+                      : (filteredDocuments!.isEmpty)
+                          ? const Center(
+                              child: Text('No matching messages found.'))
+                          : ListView.separated(
+                              separatorBuilder: (context, index)
+                                {return Divider(
+                                  color: primaryColor,
+                                  thickness: 2,
+                                  indent: 25,
+                                  endIndent: 25,
+                                );},
+                              itemCount: filteredDocuments!.length,
+                              itemBuilder: (context, index) {
+                                final doc = filteredDocuments![index];
+                                //final listCount = filteredDocuments!.length;
+                                //
+                                //DateTime import and parsing
+                                String formattedTimestamp = _formatTimestampForDisplay(doc['last_time']);
+                                //
+                                //
+                                final messageUser = filterMessageUsers(doc);
+                                final userDP = filterUserDpUrl(doc);
+                                final userID = filterUserId(doc);
+          
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatPage(
+                                          docID: doc['id'].toString(),
+                                          userName: messageUser.first,
+                                          userDP: userDP.first,
+                                          userId: userID.first,
+                                          currentUserId: currentUser!.uid,
+                                        ),
+                                      ),
+                                    );
+                                  },
+
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                                  
+                                            Row(
+                                              children: [
+                                                Column( //...............RECIEVER DP..........//
+                                                  mainAxisAlignment: MainAxisAlignment.start,
+                                                  children: [
+                                                    CircleAvatar(
+                                                      radius: 25 ,
+                                                      backgroundImage: NetworkImage(
+                                                        userDP.isEmpty ? '$userDP' : userDP.join(' ')
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                
+                                                SizedBox(width: MediaQuery.of(context).size.width * 0.03,),
+                                                          
+                                                Container(
+                                                  color: Colors.transparent,
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    mainAxisAlignment: MainAxisAlignment.end,
+                                                    children: [
+                                                      Container(
+                                                        alignment:Alignment.centerLeft,
+                                                        child: Text(
+                                                          messageUser.isEmpty ? '$messageUser' : messageUser.join(' '),
+                                                          style: const TextStyle(
+                                                            fontWeight:FontWeight.bold,
+                                                            fontSize: 15,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                            
+                                                      const Text("Student", style: TextStyle(fontSize: 12),),
+                                        
+                                                      SizedBox(height: MediaQuery.of(context).size.width * 0.01),
+                                                            
+                                                      Container(
+                                                        width: MediaQuery.of(context).size.width * 0.4,
+                                                        alignment:Alignment.bottomLeft,
+                                                        child: Text('${doc['last_msg'] ?? '(No Messages Yet)'}',
+                                                          maxLines: 1,
+                                                          overflow:TextOverflow.ellipsis,
+                                                          style: const TextStyle(
+                                                            fontWeight:FontWeight.w400
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                                  
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                Text(
                                                   formattedTimestamp,
                                                   style: const TextStyle(
                                                     fontSize: 12,
                                                   ),
-                                                )),
-                                          ),
-                                        ],
-                                      ),
+                                                )
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+
+                                        if (index == (filteredDocuments!.length - 1)) const SizedBox(
+                                          height: 10,
+                                        ),
+
+                                        if (index == (filteredDocuments!.length - 1)) Divider(
+                                          color: primaryColor,
+                                          thickness: 2,
+                                          indent: 110,
+                                          endIndent: 110,
+                                        ),
+                                      ],
                                     ),
-                                  );
-                                },
-                              ),
-                  ),
-                  
-                  // Content for THREADS tab
-                  Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(45.0),
-                        border: Border.all(width: 2, color: primaryColor)),
-                    child: const Center(
-                      child: Text('Threads Content'),
-                    ),
-                  ),
-                ],
-              ),
+                                  ),
+                                );
+                              },
+                            ),
+                ),
+              ],
             ),
           ),
         ],

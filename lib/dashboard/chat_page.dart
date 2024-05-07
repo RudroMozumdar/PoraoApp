@@ -1,3 +1,7 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class ChatPage extends StatefulWidget {
@@ -22,6 +26,13 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPage extends State<ChatPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  Timer? _timer;
+  
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   Future<List<Map<String, dynamic>>> fetchMessageList() async {
     final collectionRef = _firestore
@@ -38,6 +49,37 @@ class _ChatPage extends State<ChatPage> {
     return documents;
   }
 
+  String _formatTimestampForDisplay(dynamic timestampValue) {
+    Timestamp firebaseTimestamp = timestampValue as Timestamp;
+    DateTime dateTime = firebaseTimestamp.toDate();
+    DateTime now = DateTime.now();
+
+    // Calculate difference in days and years
+    final int differenceInDays = now.difference(dateTime).inDays;
+    final int differenceInYears = now.year - dateTime.year;
+
+    // Define the desired format pattern based on difference
+    String formattedDate;
+    if (differenceInDays == 0) {
+      // Today
+      formattedDate = DateFormat('h:mm a').format(dateTime);
+    } else if (differenceInDays == 1) {
+      // Yesterday
+      formattedDate = 'Yesterday, ${DateFormat('h:mm a').format(dateTime)}';
+    } else if (differenceInDays < 7) {
+      // Within a week, show weekday abbreviation
+      formattedDate = '${DateFormat('EEE').format(dateTime)}, ${DateFormat('h:mm a').format(dateTime)}';
+    } else if (differenceInYears == 0) {
+      // Within the same year, but more than a week ago
+      formattedDate = '${DateFormat('h:mm a').format(dateTime)}, ${DateFormat('d MMM').format(dateTime)}';
+    } else {
+      // Before the current year
+      formattedDate = '${DateFormat('h:mm a, d MMM, yyyy').format(dateTime)}';
+    }
+
+    return formattedDate;
+  }
+
   //text controller
   final TextEditingController _messageController = TextEditingController();
 
@@ -47,56 +89,75 @@ class _ChatPage extends State<ChatPage> {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: MediaQuery.of(context).size.height * 0.08,
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            CircleAvatar(
-              radius: 25,
-              backgroundImage: NetworkImage(widget.userDP),
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 23,
+                  backgroundImage: NetworkImage(widget.userDP),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.45,
+                  child: Text(
+                    "  ${widget.userName}",
+                    style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-            Text(
-              "  ${widget.userName}",
-              style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+
+            IconButton(       //.............Keyboard ATTACHMENT Button
+              onPressed: (){}, 
+              icon: const Icon(Icons.call, size: 30,),
+              style: ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(45.0),
+                  )
+                ),
+              ),
             ),
           ],
         ),
         backgroundColor: primaryColor,
       ),
-      backgroundColor: const Color.fromARGB(255, 235, 235, 235),
+      backgroundColor: Colors.white,
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: fetchMessageList(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             messages = snapshot.data!;
 
-            Timer.periodic(
-              const Duration(seconds: 2),
-              (timer) => fetchMessageList().then(
-                (data) {
-                  if (data != messages) {
-                    setState(
-                      () {
-                        messages = data;
-                      },
-                    );
-                  }
-                },
-              ),
-            );
+            // _timer = Timer.periodic(
+            //   const Duration(seconds: 2),
+            //   (timer) => fetchMessageList().then(
+            //     (data) {
+            //       if (data != messages) {
+            //         setState(
+            //           () {
+            //             messages = data;
+            //           },
+            //         );
+            //       }
+            //     },
+            //   ),
+            // );
 
             return Column(
               children: <Widget>[
                 Expanded(
-                  child: Container(
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[index];
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final message = messages[index];
 
-                        return _buildMessageBubble(
-                            message, widget.currentUserId);
-                      },
-                    ),
+                      return _buildMessageBubble(message, widget.currentUserId);
+                    },
                   ),
                 ),
                 _buildUserInput(),
@@ -112,22 +173,29 @@ class _ChatPage extends State<ChatPage> {
     );
   }
 
-  Widget _buildMessageBubble(
-      Map<String, dynamic> message, String currentUserId) {
-    final bool isSender = message['senderID'] == currentUserId;
-    final Color messageColor = isSender ? Colors.cyan : Colors.lightGreen;
-    final MainAxisAlignment mainAxisAlignment =
-        isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
-    final TextAlign textAlign = isSender ? TextAlign.right : TextAlign.left;
+  Widget _buildMessageBubble(Map<String, dynamic> message, String currentUserId) {
+    final bool isSender = message['senderID'] == currentUserId; // whether the current user is sender or not
+    final Color messageColor = isSender ? primaryColor: Colors.green;
+    final MainAxisAlignment mainAxisAlignment = isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+    const TextAlign textAlign = TextAlign.left;
+    String messageTime = _formatTimestampForDisplay(message['addTime']);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5, top: 5),
+      padding: const EdgeInsets.only(bottom: 15),
       child: Row(
         mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!isSender)
-            const SizedBox(width: 10), // Add some space for non-sender messages
+          if (!isSender) const SizedBox(width: 10), // Add some space for non-sender messages
+
+          if (isSender) Text(messageTime, style: const TextStyle(color: Colors.grey, fontSize: 12)), //Place Message time to LEFT of BOX
+
           Container(
+            margin: isSender ? const EdgeInsets.only(left: 5) : const EdgeInsets.only(right: 5),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.5,
+              minWidth: MediaQuery.of(context).size.width * 0.1,
+            ),
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
               color: messageColor,
@@ -136,11 +204,13 @@ class _ChatPage extends State<ChatPage> {
             child: Text(
               message['content'] ?? ' ',
               textAlign: textAlign,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white,),
             ),
           ),
-          if (isSender)
-            const SizedBox(width: 10), // Add some space for sender messages
+
+          if(!isSender)Text(messageTime, style: const TextStyle(color: Colors.grey, fontSize: 12)), //Place Message time to RIGHT of BOX
+
+          if (isSender) const SizedBox(width: 10), // Add some space for sender messages
         ],
       ),
     );
@@ -148,73 +218,114 @@ class _ChatPage extends State<ChatPage> {
 
   // making user input textfield
   Widget _buildUserInput() {
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: primaryColor,
+      ),
       padding: const EdgeInsets.all(10.0), // Adjust padding as needed
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 5, left: 5),
-              child: TextField(
-                controller: _messageController,
-                decoration: InputDecoration(
-                  hintText: 'Type your message',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  fillColor: Colors.white,
-                  filled: true,
-                ),
+
+          IconButton(       //.............Keyboard ATTACHMENT Button
+            onPressed: (){}, 
+            icon: const Icon(Icons.attach_file_outlined, size: 30,),
+            style: ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+              shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(45.0),
+                )
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 5),
-            child: IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () async {
-                final messageContent = _messageController.text;
 
-                final messageId = _firestore.collection('messagelist').doc().id;
-
-                try {
-                  await _firestore
-                      .collection('messages')
-                      .doc(widget.docID) // Use the existing chat document ID
-                      .collection('messagelist')
-                      .doc(messageId)
-                      .set({
-                    'content': messageContent,
-                    'addTime': FieldValue
-                        .serverTimestamp(), // Add a timestamp for message order
-                    'senderID': widget.currentUserId,
-                    'type': "text"
-                  });
-
-                  _messageController.clear();
-
-                  try {
-                    await _firestore
-                        .collection('messages')
-                        .doc(widget.docID)
-                        .update({
-                      'last_msg': messageContent,
-                      'last_time': FieldValue
-                          .serverTimestamp(), // Add a timestamp for message order
-                      'msg_num': FieldValue.increment(1),
-                    });
-                  } catch (error) {
-                    print('Error sending message: $error');
-                  }
-
-                  setState(() {}); // Refresh the UI to reflect the new message
-                } catch (error) {
-                  // Handle any errors that occur during Firestore operations
-                  print('Error sending message: $error');
-                }
-              },
-            ),
+          const SizedBox(
+            width: 10,
           ),
+
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: primaryButtonColor,
+                borderRadius: BorderRadius.circular(45)
+              ),
+              padding: const EdgeInsets.only(left: 15, right: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Type Message here',
+                        filled: true,
+                        fillColor: primaryButtonColor,
+                        border: InputBorder.none,  
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(45),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      controller: _messageController,
+                      autofocus: true,
+                      onSubmitted: (text) {
+                        print("Reply: $text");
+                      },
+                    ),
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: IconButton(
+                      onPressed: () async {
+                        final messageContent = _messageController.text;
+
+                        final messageId = _firestore.collection('messagelist').doc().id;
+
+                        try {
+                          await _firestore
+                              .collection('messages')
+                              .doc(widget.docID) // Use the existing chat document ID
+                              .collection('messagelist')
+                              .doc(messageId)
+                              .set({
+                                'content': messageContent,
+                                'addTime': FieldValue
+                                    .serverTimestamp(), // Add a timestamp for message order
+                                'senderID': widget.currentUserId,
+                                'type': "text"
+                              });
+
+                          _messageController.clear();
+
+                          try {
+                            await _firestore
+                                .collection('messages')
+                                .doc(widget.docID)
+                                .update({
+                              'last_msg': messageContent,
+                              'last_time': FieldValue
+                                  .serverTimestamp(), // Add a timestamp for message order
+                              'msg_num': FieldValue.increment(1),
+                            });
+                          } catch (error) {
+                            print('Error sending message: $error');
+                          }
+
+                          setState(() {}); // Refresh the UI to reflect the new message
+                        } catch (error) {
+                          // Handle any errors that occur during Firestore operations
+                          print('Error sending message: $error');
+                        }
+                      },
+                      icon: const Icon(Icons.send),
+                    ),
+                  )
+                ]
+              )
+            )
+          )
         ],
       ),
     );

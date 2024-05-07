@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class PersonalDetails extends StatefulWidget {
@@ -124,14 +123,39 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Rudro Mozumdar',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: primaryFont,
-                    fontSize: 25,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Rudro Mozumdar',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontFamily: primaryFont,
+                        fontSize: 25,
+                      ),
+                    ),
+
+                    GestureDetector(
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.green,
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.message_rounded, color: Colors.white),
+
+                            Text(" MESSAGE", style: TextStyle(color: Colors.white),),
+                          ],
+                        ),
+                      ),
+
+                      onTap: (){},
+                    )
+                  ],
                 ),
                 Text(
                   'Student of North South University',
@@ -229,4 +253,32 @@ class _PersonalDetailsState extends State<PersonalDetails> {
       ),
     );
   }
+
+  // void messageCreater(BuildContext context, String profileUserId) async {
+
+  //   final String curUserId = FirebaseAuth.instance.currentUser!.uid;
+
+  //   final List<String> userIds = [curUserId, profileUserId];
+
+  //   final Stream<QuerySnapshot> existingMessages = FirebaseFirestore.instance
+  //       .collection('messages')
+  //       .where('user1id', whereIn: userIds)
+  //       .where('user2id', whereIn: userIds)
+  //       .snapshots();
+
+  //   await for (final snapshot in existingMessages) {
+  //     if (snapshot.docs.isNotEmpty) {
+  //       final messageData = snapshot.docs.first.data();
+  //       return;
+  //     }
+  //   }
+
+  //   final docRef = FirebaseFirestore.instance.collection('messages').doc();
+  //   await docRef.set({
+  //     'user1id': curUserId,
+  //     'user2id': profileUserId,
+  //   });
+
+  // }
+
 }
