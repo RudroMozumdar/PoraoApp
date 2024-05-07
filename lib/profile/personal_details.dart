@@ -1,6 +1,5 @@
+import 'package:flutter/material.dart';
 import 'package:porao_app/common/all_import.dart';
-import 'package:porao_app/common/colors.dart';
-import 'package:porao_app/common/fonts.dart';
 
 class PersonalDetails extends StatefulWidget {
   const PersonalDetails({super.key});
@@ -71,7 +70,51 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                     ),
                   ],
                 ),
-              )
+              ),
+              // Show Pulic Profile-----------------------------------------------------------
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 135, right: 5),
+                  child: InkWell(
+                    onTap: () {},
+                    child: Container(
+                      width: 170,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: primaryColor,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(
+                              top: 5,
+                              right: 5,
+                              bottom: 5,
+                            ),
+                            child: Icon(
+                              Icons.remove_red_eye,
+                              color: Colors.white,
+                              size: 17,
+                            ),
+                          ),
+                          Text(
+                            "Show Public Profile",
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: const Color.fromARGB(255, 255, 255, 255),
+                              fontFamily: primaryFont,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
 
@@ -163,8 +206,13 @@ class _PersonalDetailsState extends State<PersonalDetails> {
             child: Row(
               children: [
                 IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.heart_broken),
+                  onPressed: () {
+                    // send msg here
+                  },
+                  icon: Icon(
+                    Icons.message,
+                    color: primaryColor,
+                  ),
                 ),
                 IconButton(
                   onPressed: () {},

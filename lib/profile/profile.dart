@@ -27,7 +27,6 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
             ),
-            
             Column(
               children: [
                 const SizedBox(height: 125),
@@ -57,42 +56,6 @@ class _ProfileState extends State<Profile> {
                     fontSize: 14,
                     color: const Color.fromARGB(255, 0, 0, 0),
                     fontFamily: primaryFont,
-                  ),
-                ),
-                // Show Pulic Profile-----------------------------------------------------------
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      width: 200,
-                      height: 35,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(15),
-                        color: primaryButtonColor,
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.all(6.0),
-                            child: Icon(
-                              Icons.remove_red_eye,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            "Show Public Profile",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: const Color.fromARGB(255, 255, 255, 255),
-                              fontFamily: primaryFont,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ),
                 ),
                 const Divider(endIndent: 30, indent: 30),
