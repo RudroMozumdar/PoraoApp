@@ -131,7 +131,7 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
   @override
   void dispose() {
     _tabController.dispose();
-    _refreshTimer.cancel();
+    //_refreshTimer.cancel();
     super.dispose();
   }
 

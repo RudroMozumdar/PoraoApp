@@ -2,8 +2,10 @@
     package="com.example.porao_app">
     
     <uses-permission android:name="android.permission.INTERNET"/>
+
     
     <application
+        android:requestLegacyExternalStorage="true"
         android:label="Porao App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

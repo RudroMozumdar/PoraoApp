@@ -251,20 +251,26 @@ class _ChatPage extends State<ChatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // IconButton(       //.............Keyboard ATTACHMENT Button
-          //   onPressed: (){
-          //     _pickImageFromGallery();
-          //   },
-          //   icon: const Icon(Icons.attach_file_outlined, size: 30,),
-          //   style: ButtonStyle(
-          //     backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
-          //     shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-          //       RoundedRectangleBorder(
-          //         borderRadius: BorderRadius.circular(45.0),
-          //       )
-          //     ),
-          //   ),
-          // ),
+
+          IconButton(       //.............Keyboard ATTACHMENT Button
+            onPressed: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const WhiteboardWidget(),
+                ),
+              );
+            }, 
+            icon: const Icon(Icons.attach_file_outlined, size: 30,),
+            style: ButtonStyle(
+              backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+              shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(45.0),
+                )
+              ),
+            ),
+          ),
 
           const SizedBox(
             width: 10,
@@ -375,21 +381,3 @@ class _ChatPage extends State<ChatPage> {
   }
 }
 
-// class WhiteboardWidget extends StatelessWidget {
-//   final WhiteBoardController controller;
-
-//   const WhiteboardWidget({
-//     Key? key,
-//     required this.controller,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return WhiteBoard(
-//       backgroundColor: Colors.white,
-//       strokeColor: Colors.black,
-//       strokeWidth: 3,
-//       controller: controller,
-//     );
-//   }
-// }
