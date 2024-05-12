@@ -93,11 +93,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
         })),
         menuItem(5, "Connect Us", Icons.waving_hand, false,
             MaterialPageRoute(builder: (BuildContext context) {
-          return const PublicProfile();
+          return const PublicProfile(
+            uid: 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2',
+          );
         })),
         menuItem(6, "Log Out", Icons.logout_rounded, false,
             MaterialPageRoute(builder: (BuildContext context) {
-          return const PublicProfile();
+          return const PublicProfile(
+            uid: 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2',
+          );
         })),
       ],
     );

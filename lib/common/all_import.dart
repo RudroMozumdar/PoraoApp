@@ -1,6 +1,7 @@
 export 'dart:async';
 
 export 'package:firebase_auth/firebase_auth.dart';
+export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:firebase_core/firebase_core.dart';
 export 'package:porao_app/firebase_options.dart';
 export 'package:firebase_storage/firebase_storage.dart';

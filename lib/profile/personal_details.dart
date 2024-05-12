@@ -127,9 +127,14 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                 child: InkWell(
                   onTap: () {
                     Navigator.of(context).push(
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return const PublicProfile();
-                    }));
+                      MaterialPageRoute(
+                        builder: (BuildContext context) {
+                          return const PublicProfile(
+                            uid: 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2',
+                          );
+                        },
+                      ),
+                    );
                   },
                   child: Container(
                     width: 170,

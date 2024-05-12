@@ -28,6 +28,7 @@ dependencies:
   whiteboard: ^0.0.2
   image_picker: ^1.1.1
   permission_handler: ^11.3.1
+  font_awesome_flutter: ^10.7.0
 
 
 dev_dependencies:
