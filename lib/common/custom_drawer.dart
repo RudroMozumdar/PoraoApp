@@ -1,13 +1,15 @@
 import 'package:porao_app/common/all_import.dart';
 // https://youtu.be/ufer4QTFTO8
 
-class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
+class CustomDrawer extends StatefulWidget {
   final String username;
-  const CustomDrawer({
-    super.key,
-    required this.username,
-  });
+  const CustomDrawer({super.key, required this.username});
 
+  @override
+  State<CustomDrawer> createState() => _CustomDrawerState();
+}
+
+class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -71,28 +73,46 @@ class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget drawerList() {
-    return Container(
-      padding: const EdgeInsets.only(top: 15),
-      child: Column(
-        children: [
-          menuItem(1, "Dashboard", Icons.dashboard, true),
-          menuItem(1, "Contacts", Icons.contact_page, false),
-          menuItem(1, "Notes", Icons.note, false),
-          menuItem(1, "Notifications", Icons.notifications, false),
-          menuItem(1, "Feedback", Icons.feedback, false),
-          menuItem(1, "Privacy Policy", Icons.privacy_tip, false),
-        ],
-      ),
+    return Column(
+      children: [
+        menuItem(1, "Personal Details", Icons.person, true,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const PersonalDetails();
+        })),
+        menuItem(2, "Settings", Icons.settings, false,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const AppSettings();
+        })),
+        menuItem(3, "Feedback", Icons.feedback, false,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const FeedBack();
+        })),
+        menuItem(4, "FAQ", Icons.format_quote, false,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const Faq();
+        })),
+        menuItem(5, "Connect Us", Icons.waving_hand, false,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const PublicProfile();
+        })),
+        menuItem(6, "Log Out", Icons.logout_rounded, false,
+            MaterialPageRoute(builder: (BuildContext context) {
+          return const PublicProfile();
+        })),
+      ],
     );
   }
 
-  Widget menuItem(int id, String title, IconData icon, bool selected) {
+  Widget menuItem(int id, String title, IconData icon, bool selected,
+      MaterialPageRoute targetPage) {
     return Material(
       color: selected
           ? const Color.fromARGB(255, 218, 218, 218)
           : Colors.transparent,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.of(context).push(targetPage);
+        },
         child: Padding(
           padding: const EdgeInsets.all(15),
           child: Row(
@@ -120,9 +140,6 @@ class CustomDrawer extends StatelessWidget implements PreferredSizeWidget {
       ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(56);
 }
 
 enum DrawerSectons {

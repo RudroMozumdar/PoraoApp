@@ -1,9 +1,5 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
-import 'package:porao_app/dashboard/whiteboard.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class ChatPage extends StatefulWidget {
@@ -31,7 +27,7 @@ class _ChatPage extends State<ChatPage> {
   bool showWhiteboard = false;
   Timer? _timer;
   File? _selectedImage;
-  
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -74,13 +70,15 @@ class _ChatPage extends State<ChatPage> {
       formattedDate = 'Yesterday, ${DateFormat('h:mm a').format(dateTime)}';
     } else if (differenceInDays < 7) {
       // Within a week, show weekday abbreviation
-      formattedDate = '${DateFormat('EEE').format(dateTime)}, ${DateFormat('h:mm a').format(dateTime)}';
+      formattedDate =
+          '${DateFormat('EEE').format(dateTime)}, ${DateFormat('h:mm a').format(dateTime)}';
     } else if (differenceInYears == 0) {
       // Within the same year, but more than a week ago
-      formattedDate = '${DateFormat('h:mm a').format(dateTime)}, ${DateFormat('d MMM').format(dateTime)}';
+      formattedDate =
+          '${DateFormat('h:mm a').format(dateTime)}, ${DateFormat('d MMM').format(dateTime)}';
     } else {
       // Before the current year
-      formattedDate = '${DateFormat('h:mm a, d MMM, yyyy').format(dateTime)}';
+      formattedDate = DateFormat('h:mm a, d MMM, yyyy').format(dateTime);
     }
 
     return formattedDate;
@@ -108,23 +106,27 @@ class _ChatPage extends State<ChatPage> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.45,
                   child: Text(
-                    "  ${widget.userName}",                     // Reciever NAME
-                    style: const TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+                    "  ${widget.userName}", // Reciever NAME
+                    style: const TextStyle(
+                        fontSize: 23, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
-
-            IconButton(       //.............CALL Button
-              onPressed: (){}, 
-              icon: const Icon(Icons.call, size: 30,),
+            IconButton(
+              //.............CALL Button
+              onPressed: () {},
+              icon: const Icon(
+                Icons.call,
+                size: 30,
+              ),
               style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                backgroundColor:
+                    MaterialStatePropertyAll<Color>(primaryButtonColor),
                 shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(45.0),
-                  )
-                ),
+                    RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(45.0),
+                )),
               ),
             ),
           ],
@@ -179,10 +181,13 @@ class _ChatPage extends State<ChatPage> {
     );
   }
 
-  Widget _buildMessageBubble(Map<String, dynamic> message, String currentUserId) {
-    final bool isSender = message['senderID'] == currentUserId; // whether the current user is sender or not
-    final Color messageColor = isSender ? primaryColor: Colors.green;
-    final MainAxisAlignment mainAxisAlignment = isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
+  Widget _buildMessageBubble(
+      Map<String, dynamic> message, String currentUserId) {
+    final bool isSender = message['senderID'] ==
+        currentUserId; // whether the current user is sender or not
+    final Color messageColor = isSender ? primaryColor : Colors.green;
+    final MainAxisAlignment mainAxisAlignment =
+        isSender ? MainAxisAlignment.end : MainAxisAlignment.start;
     const TextAlign textAlign = TextAlign.left;
     String messageTime = _formatTimestampForDisplay(message['addTime']);
 
@@ -192,12 +197,19 @@ class _ChatPage extends State<ChatPage> {
         mainAxisAlignment: mainAxisAlignment,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          if (!isSender) const SizedBox(width: 10), // Add some space for non-sender messages
+          if (!isSender)
+            const SizedBox(width: 10), // Add some space for non-sender messages
 
-          if (isSender) Text(messageTime, style: const TextStyle(color: Colors.grey, fontSize: 12)), //Place Message time to LEFT of BOX
+          if (isSender)
+            Text(messageTime,
+                style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12)), //Place Message time to LEFT of BOX
 
           Container(
-            margin: isSender ? const EdgeInsets.only(left: 5) : const EdgeInsets.only(right: 5),
+            margin: isSender
+                ? const EdgeInsets.only(left: 5)
+                : const EdgeInsets.only(right: 5),
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.5,
               minWidth: MediaQuery.of(context).size.width * 0.1,
@@ -210,13 +222,20 @@ class _ChatPage extends State<ChatPage> {
             child: Text(
               message['content'] ?? ' ',
               textAlign: textAlign,
-              style: const TextStyle(color: Colors.white,),
+              style: const TextStyle(
+                color: Colors.white,
+              ),
             ),
           ),
 
-          if(!isSender)Text(messageTime, style: const TextStyle(color: Colors.grey, fontSize: 12)), //Place Message time to RIGHT of BOX
+          if (!isSender)
+            Text(messageTime,
+                style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12)), //Place Message time to RIGHT of BOX
 
-          if (isSender) const SizedBox(width: 10), // Add some space for sender messages
+          if (isSender)
+            const SizedBox(width: 10), // Add some space for sender messages
         ],
       ),
     );
@@ -232,11 +251,10 @@ class _ChatPage extends State<ChatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
           // IconButton(       //.............Keyboard ATTACHMENT Button
           //   onPressed: (){
           //     _pickImageFromGallery();
-          //   }, 
+          //   },
           //   icon: const Icon(Icons.attach_file_outlined, size: 30,),
           //   style: ButtonStyle(
           //     backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
@@ -253,87 +271,84 @@ class _ChatPage extends State<ChatPage> {
           ),
 
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: primaryButtonColor,
-                borderRadius: BorderRadius.circular(45)
-              ),
-              padding: const EdgeInsets.only(left: 15, right: 10),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Type Message here',
-                        filled: true,
-                        fillColor: primaryButtonColor,
-                        border: InputBorder.none,  
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(45),
-                          borderSide: BorderSide.none,
+              child: Container(
+                  decoration: BoxDecoration(
+                      color: primaryButtonColor,
+                      borderRadius: BorderRadius.circular(45)),
+                  padding: const EdgeInsets.only(left: 15, right: 10),
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Type Message here',
+                              filled: true,
+                              fillColor: primaryButtonColor,
+                              border: InputBorder.none,
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(45),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            controller: _messageController,
+                            autofocus: true,
+                            onSubmitted: (text) {
+                              print("Reply: $text");
+                            },
+                          ),
                         ),
-                      ),
-                      controller: _messageController,
-                      autofocus: true,
-                      onSubmitted: (text) {
-                        print("Reply: $text");
-                      },
-                    ),
-                  ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 5),
+                          child: IconButton(
+                            onPressed: () async {
+                              final messageContent = _messageController.text;
 
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: IconButton(
-                      onPressed: () async {
-                        final messageContent = _messageController.text;
+                              final messageId =
+                                  _firestore.collection('messagelist').doc().id;
 
-                        final messageId = _firestore.collection('messagelist').doc().id;
+                              try {
+                                await _firestore
+                                    .collection('messages')
+                                    .doc(widget
+                                        .docID) // Use the existing chat document ID
+                                    .collection('messagelist')
+                                    .doc(messageId)
+                                    .set({
+                                  'content': messageContent,
+                                  'addTime': FieldValue
+                                      .serverTimestamp(), // Add a timestamp for message order
+                                  'senderID': widget.currentUserId,
+                                  'type': "text"
+                                });
 
-                        try {
-                          await _firestore
-                              .collection('messages')
-                              .doc(widget.docID) // Use the existing chat document ID
-                              .collection('messagelist')
-                              .doc(messageId)
-                              .set({
-                                'content': messageContent,
-                                'addTime': FieldValue
-                                    .serverTimestamp(), // Add a timestamp for message order
-                                'senderID': widget.currentUserId,
-                                'type': "text"
-                              });
+                                _messageController.clear();
 
-                          _messageController.clear();
+                                try {
+                                  await _firestore
+                                      .collection('messages')
+                                      .doc(widget.docID)
+                                      .update({
+                                    'last_msg': messageContent,
+                                    'last_time': FieldValue
+                                        .serverTimestamp(), // Add a timestamp for message order
+                                    'msg_num': FieldValue.increment(1),
+                                  });
+                                } catch (error) {
+                                  print('Error sending message: $error');
+                                }
 
-                          try {
-                            await _firestore
-                                .collection('messages')
-                                .doc(widget.docID)
-                                .update({
-                              'last_msg': messageContent,
-                              'last_time': FieldValue
-                                  .serverTimestamp(), // Add a timestamp for message order
-                              'msg_num': FieldValue.increment(1),
-                            });
-                          } catch (error) {
-                            print('Error sending message: $error');
-                          }
-
-                          setState(() {}); // Refresh the UI to reflect the new message
-                        } catch (error) {
-                          // Handle any errors that occur during Firestore operations
-                          print('Error sending message: $error');
-                        }
-                      },
-                      icon: const Icon(Icons.send),
-                    ),
-                  )
-                ]
-              )
-            )
-          )
+                                setState(
+                                    () {}); // Refresh the UI to reflect the new message
+                              } catch (error) {
+                                // Handle any errors that occur during Firestore operations
+                                print('Error sending message: $error');
+                              }
+                            },
+                            icon: const Icon(Icons.send),
+                          ),
+                        )
+                      ])))
         ],
       ),
     );
@@ -344,7 +359,8 @@ class _ChatPage extends State<ChatPage> {
 
     if (status == PermissionStatus.granted) {
       // Permission granted, proceed with picking the image
-      final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final returnedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (returnedImage != null) {
         setState(() {
           _selectedImage = File(returnedImage.path);
@@ -357,7 +373,6 @@ class _ChatPage extends State<ChatPage> {
       print('Didnt work');
     }
   }
-
 }
 
 // class WhiteboardWidget extends StatelessWidget {

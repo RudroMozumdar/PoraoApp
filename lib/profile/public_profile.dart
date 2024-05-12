@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:porao_app/common/all_import.dart';
 
 class PublicProfile extends StatefulWidget {
@@ -10,46 +8,94 @@ class PublicProfile extends StatefulWidget {
 }
 
 class _PublicProfileState extends State<PublicProfile> {
+  String name = "";
+  String designation = "";
+  String institution = "";
+  String location = "";
+  double rating = 0.0;
+  int conversation = 0;
+  String dpurl = "";
+  String coverurl = "";
+  String aboutContent = "";
+  List<String> hashtags = [];
+  List<dynamic> qualificationsList = [];
+  List<dynamic> reviews = [];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Rudro Mozumdar',
-          style: TextStyle(
-            fontFamily: primaryFont,
-            fontSize: 20,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
+    return FutureBuilder(
+      future: FirebaseFirestore.instance.collection('users').get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: SizedBox(
+              width: 50.0,
+              height: 50.0,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        int userIndex = snapshot.data!.docs.indexWhere(
+            (element) => element.id == 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2');
+        final userData = snapshot.data?.docs[userIndex].data();
+
+        name = userData!['name'];
+        designation = userData['designation'];
+        institution = userData['institution-name'];
+        location = userData['location'];
+        rating = userData['rating']?.toDouble();
+        conversation = userData['conversations']?.toInt();
+        dpurl = userData['dp-url'];
+        coverurl = userData['cover-url'];
+        aboutContent = userData['about'];
+        hashtags = userData['hashtags'].cast<String>();
+        qualificationsList = userData['qualifications'].cast<dynamic>();
+        reviews = userData['qualifications'].cast<dynamic>();
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              name,
+              style: TextStyle(
+                fontFamily: primaryFont,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+            backgroundColor: primaryColor,
+            leading: IconButton(
+              onPressed: () {
+                currentTab = 0;
+                pageController.animateToPage(
+                  currentTab,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.fastEaseInToSlowEaseOut,
+                );
+              },
+              icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            ),
           ),
-        ),
-        backgroundColor: primaryColor,
-        leading: IconButton(
-          onPressed: () {
-            currentTab = 0;
-            pageController.animateToPage(
-              currentTab,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastEaseInToSlowEaseOut,
-            );
-          },
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            coverAndDP(),
-            names(),
-            actions(),
-            deviderWithShadow(),
-            review(),
-            deviderWithShadow(),
-            experties(),
-          ],
-        ),
-      ),
+          body: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                coverAndDP(),
+                names(),
+                deviderWithShadow(),
+                about(),
+                deviderWithShadow(),
+                qualifications(),
+                hashTagsChips(),
+                deviderWithShadow(),
+                review(),
+                deviderWithShadow(),
+                experties(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -60,55 +106,57 @@ class _PublicProfileState extends State<PublicProfile> {
         Stack(
           children: [
             // --------------------------------------------------------Cover
-            const Image(
+            Image(
               height: 130,
               width: double.infinity,
               fit: BoxFit.cover,
-              image: AssetImage('assets/images/rudro.jpg'),
+              image: NetworkImage(coverurl),
             ),
             // -----------------------------------------------Display Picture Section
-            Container(
-              width: 100,
-              height: 100,
-              margin: const EdgeInsets.only(top: 80, left: 30),
-              child: Stack(
-                children: [
-                  // ------------------------------------Display Picture
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[900],
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    child: const ClipOval(
-                      child: Image(
-                        height: 90,
-                        width: 90,
-                        image: AssetImage('assets/images/rudro.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  // -------------------------------------------------Add Icon (Change DP)
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      margin: const EdgeInsets.all(2),
+            Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                margin: const EdgeInsets.only(top: 80, left: 30),
+                child: Stack(
+                  children: [
+                    // ------------------------------------Display Picture
+                    Container(
+                      padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                         color: Colors.grey[900],
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(100),
                       ),
-                      child: Container(
-                        margin: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(20),
+                      child: ClipOval(
+                        child: Image(
+                          height: 90,
+                          width: 90,
+                          image: NetworkImage(dpurl),
+                          fit: BoxFit.cover,
                         ),
-                        child: const Icon(Icons.add),
                       ),
                     ),
-                  ),
-                ],
+                    // -------------------------------------------------Add Icon (Change DP)
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[900],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(Icons.add),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             // -------------------------------------------------------- Message
@@ -149,10 +197,10 @@ class _PublicProfileState extends State<PublicProfile> {
     return Container(
       padding: const EdgeInsets.only(left: 8),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Rudro Mozumdar',
+            name,
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Colors.white,
@@ -161,7 +209,7 @@ class _PublicProfileState extends State<PublicProfile> {
             ),
           ),
           Text(
-            'Student of North South University',
+            '$designation at $institution',
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Colors.white,
@@ -171,7 +219,7 @@ class _PublicProfileState extends State<PublicProfile> {
           ),
           const SizedBox(height: 10),
           Text(
-            'North South University',
+            institution,
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Colors.white,
@@ -180,7 +228,7 @@ class _PublicProfileState extends State<PublicProfile> {
             ),
           ),
           Text(
-            'Dhala, Bangladesh',
+            location,
             textAlign: TextAlign.left,
             style: TextStyle(
               color: Colors.grey,
@@ -190,9 +238,10 @@ class _PublicProfileState extends State<PublicProfile> {
           ),
           // -----------------------------------------------------Review
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                '4.7 ',
+                '$rating ',
                 textAlign: TextAlign.left,
                 style: TextStyle(
                   color: primaryColor,
@@ -214,7 +263,7 @@ class _PublicProfileState extends State<PublicProfile> {
                     borderRadius: BorderRadius.circular(5)),
               ),
               Text(
-                '10 Conversation Started',
+                '$conversation Conversation Started',
                 textAlign: TextAlign.left,
                 style: TextStyle(
                   color: primaryColor,
@@ -229,29 +278,104 @@ class _PublicProfileState extends State<PublicProfile> {
     );
   }
 
-  Widget actions() {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      child: Row(
+  Widget about() {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            onPressed: () {
-              // send msg here
-            },
-            icon: Icon(
-              Icons.message,
-              color: primaryColor,
+          Text(
+            'About',
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: primaryFont,
+              fontSize: 20,
             ),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.heart_broken),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.heart_broken),
+          ExpandableText(
+            aboutContent,
+            expandText: 'show more.',
+            maxLines: 3,
+            linkColor: Colors.blue,
+            animation: true,
+            collapseText: '...show less',
+            expandOnTextTap: true,
+            collapseOnTextTap: true,
+            textAlign: TextAlign.justify,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: primaryFont,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget hashTagsChips() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Wrap(
+        children: hashtags.map((hashtag) => chipForHashtag(hashtag)).toList(),
+      ),
+    );
+  }
+
+  Widget chipForHashtag(String hashtag) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: Chip(
+        labelPadding: const EdgeInsets.all(0),
+        avatar: const Icon(
+          Icons.tag_rounded,
+          color: Color.fromARGB(255, 0, 0, 0),
+        ),
+        label: Text(
+          hashtag,
+          style: TextStyle(
+            fontFamily: primaryFont,
+            color: const Color.fromARGB(255, 0, 0, 0),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 166, 230, 255),
+      ),
+    );
+  }
+
+  Widget qualifications() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        children: qualificationsList
+            .map(
+                (quals) => qualificationItems(quals['icon-tag'], quals['text']))
+            .toList(),
+      ),
+    );
+  }
+
+  Widget qualificationItems(String iconTag, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 3),
+      child: SizedBox(
+        height: 45,
+        child: Row(
+          children: [
+            Icon(
+              iconTag == 'study' ? Icons.menu_book_sharp : Icons.work,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 7),
+            Text(
+              text,
+              style: TextStyle(
+                fontFamily: primaryFont,
+                color: Colors.white,
+                fontSize: 15,
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -355,7 +479,7 @@ class _PublicProfileState extends State<PublicProfile> {
   }
 
   Widget experties() {
-    return const Placeholder();
+    return Container();
   }
 
   Widget deviderWithShadow() {
