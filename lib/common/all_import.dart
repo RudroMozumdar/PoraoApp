@@ -1,4 +1,5 @@
 export 'dart:async';
+export 'dart:io';
 
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:firebase_core/firebase_core.dart';
@@ -28,6 +29,7 @@ export 'package:porao_app/dashboard/chat_page.dart';
 export 'package:porao_app/dashboard/my_posts.dart';
 export 'package:porao_app/dashboard/create_post.dart';
 export 'package:porao_app/dashboard/answer_page.dart';
+export 'package:porao_app/dashboard/whiteboard.dart';
 
 export 'package:porao_app/common/fonts.dart';
 export 'package:porao_app/common/colors.dart';
