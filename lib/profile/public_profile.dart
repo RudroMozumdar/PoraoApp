@@ -276,7 +276,9 @@ class _PublicProfileState extends State<PublicProfile> {
                 ],
               ),
             ),
-            onTap: () {},
+            onTap: () async {
+
+            },
           ),
         ),
       ],
@@ -632,4 +634,75 @@ class _PublicProfileState extends State<PublicProfile> {
       ],
     );
   }
+
+  void messageBuilder() async {
+    final String curUserId = FirebaseAuth.instance.currentUser!.uid;
+
+    final List<String> userIds = [curUserId, widget.uid];
+
+    final Stream<QuerySnapshot> existingMessages = FirebaseFirestore.instance
+        .collection('messages')
+        .where('user1id', whereIn: userIds)
+        .where('user2id', whereIn: userIds)
+        .snapshots();
+
+    // await for (final snapshot in existingMessages) {
+    //   if (snapshot.docs.isNotEmpty) {
+    //     // Existing message found, process data
+    //     final messageData = snapshot.docs.first.data();
+    //     final String docID = snapshot.docs.first.id; // Get document ID
+
+    //     // Determine user information based on current user ID
+    //     final String userName = messageData?.['user1_id'] == curUserId
+    //       ? messageData?.['user2_name']
+    //       : messageData?.['user1_name'];
+    //   final String userDP = messageData?.['user1_id'] == curUserId
+    //       ? messageData?.['user2DpUrl']
+    //       : messageData?.['user1DpUrl'];
+    //   final String userId = messageData?.['user1_id'] == curUserId
+    //       ? messageData?.['user2_id']
+    //       : messageData?.['user1_id'];
+
+    //     // Push to ChatPage with retrieved data
+    //     Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => ChatPage(
+    //           docID: docID,
+    //           userName: userName,
+    //           userDP: userDP,
+    //           userId: userId,
+    //           currentUserId: curUserId,
+    //         ),
+    //       ),
+    //     );
+    //     return; // Exit the loop after processing the first message (assuming only one match)
+    //   }
+    // }
+
+    // No existing message found, create a new document
+    final sender = FirebaseFirestore.instance.collection('user').doc(curUserId).get();
+    final senderData = (await sender).data();
+
+    final senderName = senderData!['name']; // Use null-assertion after await
+    final senderDP = senderData['DP'];
+
+    final receiver = FirebaseFirestore.instance.collection('user').doc(widget.uid).get();
+    final receiverData = (await receiver).data();
+
+    final receiverName = receiverData!['name'];
+    final receiverDP = receiverData['DP'];
+
+    final docRef = FirebaseFirestore.instance.collection('messages').doc();
+    await docRef.set({
+      'user1_id': curUserId,
+      'user2_id': widget.uid,
+      'user1_name': senderName,
+      'user2_name': receiverName,
+      'user1DpUrl': senderDP,
+      'user2DpUrl': receiverDP,
+      'msg_num': 0,
+    });
+  }
+
 }

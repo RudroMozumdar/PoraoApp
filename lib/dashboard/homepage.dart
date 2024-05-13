@@ -199,7 +199,13 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           // Image
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              String authorID = post['authorId'];
+                              MaterialPageRoute
+                              (
+                                builder: (context) => PublicProfile(uid: authorID,)                              
+                              );
+                            },
                             child: CircleAvatar(
                               radius: 25,
                               backgroundImage: NetworkImage(post['dp-url']),

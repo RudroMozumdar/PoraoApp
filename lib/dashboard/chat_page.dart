@@ -1,5 +1,6 @@
 import 'package:intl/intl.dart';
 import 'dart:io';
+import 'package:porao_app/call/tempCall.dart';
 import 'package:porao_app/common/all_import.dart';
 
 class ChatPage extends StatefulWidget {
@@ -115,7 +116,18 @@ class _ChatPage extends State<ChatPage> {
             ),
             IconButton(
               //.............CALL Button
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CallScreen(
+                      name: widget.userName,
+                      DP: widget.userDP,
+                    ),
+                  ),
+                );
+                
+              },
               icon: const Icon(
                 Icons.call,
                 size: 30,
@@ -140,20 +152,20 @@ class _ChatPage extends State<ChatPage> {
           if (snapshot.hasData) {
             messages = snapshot.data!;
 
-            // _timer = Timer.periodic(
-            //   const Duration(seconds: 2),
-            //   (timer) => fetchMessageList().then(
-            //     (data) {
-            //       if (data != messages) {
-            //         setState(
-            //           () {
-            //             messages = data;
-            //           },
-            //         );
-            //       }
-            //     },
-            //   ),
-            // );
+            _timer = Timer.periodic(
+              const Duration(seconds: 2),
+              (timer) => fetchMessageList().then(
+                (data) {
+                  if (data != messages) {
+                    setState(
+                      () {
+                        messages = data;
+                      },
+                    );
+                  }
+                },
+              ),
+            );
 
             return Column(
               children: <Widget>[
@@ -322,8 +334,7 @@ class _ChatPage extends State<ChatPage> {
                                     .doc(messageId)
                                     .set({
                                   'content': messageContent,
-                                  'addTime': FieldValue
-                                      .serverTimestamp(), // Add a timestamp for message order
+                                  'addTime': Timestamp.now(), // Add a timestamp for message order
                                   'senderID': widget.currentUserId,
                                   'type': "text"
                                 });
@@ -336,8 +347,7 @@ class _ChatPage extends State<ChatPage> {
                                       .doc(widget.docID)
                                       .update({
                                     'last_msg': messageContent,
-                                    'last_time': FieldValue
-                                        .serverTimestamp(), // Add a timestamp for message order
+                                    'last_time': Timestamp.now(), // Add a timestamp for message order
                                     'msg_num': FieldValue.increment(1),
                                   });
                                 } catch (error) {
