@@ -73,12 +73,7 @@ class _PublicProfileState extends State<PublicProfile> {
             backgroundColor: primaryColor,
             leading: IconButton(
               onPressed: () {
-                currentTab = 0;
-                pageController.animateToPage(
-                  currentTab,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.fastEaseInToSlowEaseOut,
-                );
+                Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios_new_rounded),
             ),
@@ -244,12 +239,39 @@ class _PublicProfileState extends State<PublicProfile> {
           icon: const Icon(FontAwesomeIcons.linkedin),
           color: Colors.green,
         ),
-        IconButton(
-          onPressed: () {},
-          icon: const Icon(FontAwesomeIcons.phone),
-          color: Colors.green,
+        // ---------------------------------------------------- Write a review
+        Align(
+          alignment: Alignment.bottomRight,
+          child: GestureDetector(
+            child: Container(
+              height: 35,
+              width: 130,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.green,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.reviews,
+                    color: textColor,
+                    size: 20,
+                  ),
+                  Text(
+                    " Give a Review",
+                    style: TextStyle(color: textColor, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            onTap: () async {
+              showReviewDialog(context);
+            },
+          ),
         ),
-        // -------------------------------------------------------- Message
+        // ----------------------------------------------Message
         Align(
           alignment: Alignment.bottomRight,
           child: GestureDetector(
@@ -276,9 +298,7 @@ class _PublicProfileState extends State<PublicProfile> {
                 ],
               ),
             ),
-            onTap: () async {
-
-            },
+            onTap: () async {},
           ),
         ),
       ],
@@ -635,6 +655,76 @@ class _PublicProfileState extends State<PublicProfile> {
     );
   }
 
+  void showReviewDialog(BuildContext context) {
+    double userRating = 0.0;
+    final TextEditingController reviewController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: primaryColor,
+          title: Text(
+            'Write a Review',
+            style: TextStyle(
+              fontFamily: primaryFont,
+              color: Colors.black,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RatingBar.builder(
+                initialRating: userRating,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 30.0,
+                itemBuilder: (context, _) => const Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    userRating = rating;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: reviewController,
+                decoration: InputDecoration(
+                  hintStyle: TextStyle(
+                    fontFamily: primaryFont,
+                    color: Colors.black,
+                  ),
+                  hintText: 'Write your review here...',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                String reviewerUID = Auth().currentUser!.uid;
+                final reviewText = reviewController.text;
+                print('Rating: $userRating, Review: $reviewText $reviewerUID');
+                Navigator.pop(context);
+              },
+              child: const Text('SUBMIT'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void messageBuilder() async {
     final String curUserId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -681,13 +771,15 @@ class _PublicProfileState extends State<PublicProfile> {
     // }
 
     // No existing message found, create a new document
-    final sender = FirebaseFirestore.instance.collection('user').doc(curUserId).get();
+    final sender =
+        FirebaseFirestore.instance.collection('user').doc(curUserId).get();
     final senderData = (await sender).data();
 
     final senderName = senderData!['name']; // Use null-assertion after await
     final senderDP = senderData['DP'];
 
-    final receiver = FirebaseFirestore.instance.collection('user').doc(widget.uid).get();
+    final receiver =
+        FirebaseFirestore.instance.collection('user').doc(widget.uid).get();
     final receiverData = (await receiver).data();
 
     final receiverName = receiverData!['name'];
@@ -704,5 +796,4 @@ class _PublicProfileState extends State<PublicProfile> {
       'msg_num': 0,
     });
   }
-
 }

@@ -75,9 +75,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
   Widget drawerList() {
     return Column(
       children: [
-        menuItem(1, "Personal Details", Icons.person, true,
+        menuItem(1, "View Public Profile", Icons.person, true,
             MaterialPageRoute(builder: (BuildContext context) {
-          return const PersonalDetails();
+          return PublicProfile(
+            uid: Auth().currentUser!.uid,
+          );
         })),
         menuItem(2, "Settings", Icons.settings, false,
             MaterialPageRoute(builder: (BuildContext context) {
@@ -97,12 +99,43 @@ class _CustomDrawerState extends State<CustomDrawer> {
             uid: 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2',
           );
         })),
-        menuItem(6, "Log Out", Icons.logout_rounded, false,
-            MaterialPageRoute(builder: (BuildContext context) {
-          return const PublicProfile(
-            uid: 'rNc4Xg5B4CbjBaJzCzUoySNAqxF2',
-          );
-        })),
+        InkWell(
+          onTap: () {
+            Auth().signOut();
+            Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return const Login();
+                },
+              ),
+              (_) => false,
+            );
+          },
+          child: const Padding(
+            padding: EdgeInsets.all(15),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Icon(
+                    Icons.logout_rounded,
+                    size: 20,
+                    color: Colors.black,
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(
+                    'Log Out',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

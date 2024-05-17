@@ -13,6 +13,7 @@ export 'package:expandable_text/expandable_text.dart';
 export 'package:permission_handler/permission_handler.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart' hide AsyncError;
 export 'package:image_picker/image_picker.dart';
+export 'package:flutter_rating_bar/flutter_rating_bar.dart';
 export 'dart:async' hide AsyncError;
 
 // Pages Import
@@ -51,6 +52,7 @@ export 'package:porao_app/profile/faq.dart';
 export 'package:porao_app/profile/app_settings.dart';
 export 'package:porao_app/profile/personal_details.dart';
 export 'package:porao_app/profile/public_profile.dart';
+export 'package:porao_app/profile/review_dialog.dart';
 
 // Temporary
 export 'package:porao_app/temp/dev.dart';
