@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:porao_app/common/all_import.dart';
@@ -49,7 +50,7 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
       formattedDate = '${DateFormat('EEE').format(dateTime)}, ${DateFormat('h:mm a').format(dateTime)}';
     } else {
       // More than a week, show full date
-      formattedDate = DateFormat('d MMM, yyyy').format(dateTime);
+      formattedDate = DateFormat('dd MMM, yyyy').format(dateTime);
     }
 
     return formattedDate;
@@ -499,7 +500,7 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                 
                 // Content for MESSAGES Tab
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 15, 10),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(45.0),
@@ -610,16 +611,11 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                                               ],
                                             ),
                                                   
-                                            Column(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: [
-                                                Text(
-                                                  formattedTimestamp,
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                  ),
-                                                )
-                                              ],
+                                            Text(
+                                              formattedTimestamp,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
                                             ),
                                           ],
                                         ),

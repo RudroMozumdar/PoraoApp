@@ -119,14 +119,16 @@ class _ChatPage extends State<ChatPage> {
               onPressed: () {
                 Navigator.push(
                   context,
+                  // MaterialPageRoute(
+                  //   builder: (context) => CallScreen(
+                  //     name: widget.userName,
+                  //     DP: widget.userDP,
+                  //   ),
+                  // ),
                   MaterialPageRoute(
-                    builder: (context) => CallScreen(
-                      name: widget.userName,
-                      DP: widget.userDP,
-                    ),
-                  ),
-                );
-                
+                    builder: ((context) => const CallerWidget())
+                  )
+                );                
               },
               icon: const Icon(
                 Icons.call,
