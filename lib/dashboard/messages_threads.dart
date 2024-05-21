@@ -150,48 +150,95 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
     //_tabController.addListener(_handleTabChange);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: primaryColor,
       body: Stack(
         children: [
           
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Container(
-              padding: const EdgeInsets.only(top: 20, bottom: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(45),
-                border: Border.all(width: 1, color: const Color.fromARGB(255, 229, 245, 227)),
-                gradient: const LinearGradient(
-                  colors: <Color>[
-                    Color.fromARGB(255, 229, 245, 227),
-                    Colors.white,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+          Container(
+            decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(45),
+              topRight: Radius.circular(45),
+            )
+          ),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                padding: const EdgeInsets.only(top: 20, bottom: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(45),
+                  border: Border.all(width: 1, color: const Color.fromARGB(255, 229, 245, 227)),
+                  gradient: const LinearGradient(
+                    colors: <Color>[
+                      Color.fromARGB(255, 229, 245, 227),
+                      Colors.white,
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
                 ),
-              ),
-              child: Column(
-                children: [
-
-                  Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: Theme.of(context).colorScheme.copyWith(
-                        surfaceVariant: Colors.transparent,
-                      )
-                    ),
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: [
-
-                        //...................THREADS TAB HEADING.................//
-                        Tab(
-                          child: Container(
-                            padding: _selectedIndex == 0 ? const EdgeInsets.all(5) : const EdgeInsets.all(0), 
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(45),
-                              color: primaryColor,
-                            ),
-                            child: _selectedIndex == 0 
+                child: Column(
+                  children: [
+                
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: Theme.of(context).colorScheme.copyWith(
+                          surfaceVariant: Colors.transparent,
+                        )
+                      ),
+                      child: TabBar(
+                        controller: _tabController,
+                        tabs: [
+                
+                          //...................THREADS TAB HEADING.................//
+                          Tab(
+                            child: Container(
+                              padding: _selectedIndex == 0 ? const EdgeInsets.all(5) : const EdgeInsets.all(0), 
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: primaryColor,
+                              ),
+                              child: _selectedIndex == 0 
+                                ? Container(
+                                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(width: 3, color: Colors.white),
+                                    borderRadius: BorderRadius.circular(45)
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Threads",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white
+                                      ),  
+                                    ),
+                                  ),
+                                ) 
+                              : const Center(
+                                child: Text(
+                                  "Threads",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.white
+                                  ),  
+                                ),
+                              ),
+                            )
+                          ),
+                      
+                          //...................MESSAGES TAB HEADING.................//
+                          Tab(
+                            child: Container(
+                              padding: _selectedIndex == 1 ? const EdgeInsets.all(5) : const EdgeInsets.all(0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(45),
+                                color: primaryColor
+                              ),
+                              child: _selectedIndex == 1 
                               ? Container(
                                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                                 decoration: BoxDecoration(
@@ -200,42 +247,15 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                                 ),
                                 child: const Center(
                                   child: Text(
-                                    "Threads",
+                                    "Messages",
                                     style: TextStyle(
                                       fontSize: 20,
                                       color: Colors.white
                                     ),  
                                   ),
                                 ),
-                              ) 
-                            : const Center(
-                              child: Text(
-                                "Threads",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white
-                                ),  
-                              ),
-                            ),
-                          )
-                        ),
-                    
-                        //...................MESSAGES TAB HEADING.................//
-                        Tab(
-                          child: Container(
-                            padding: _selectedIndex == 1 ? const EdgeInsets.all(5) : const EdgeInsets.all(0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(45),
-                              color: primaryColor
-                            ),
-                            child: _selectedIndex == 1 
-                            ? Container(
-                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                              decoration: BoxDecoration(
-                                border: Border.all(width: 3, color: Colors.white),
-                                borderRadius: BorderRadius.circular(45)
-                              ),
-                              child: const Center(
+                              )
+                              : const Center(
                                 child: Text(
                                   "Messages",
                                   style: TextStyle(
@@ -245,28 +265,19 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                                 ),
                               ),
                             )
-                            : const Center(
-                              child: Text(
-                                "Messages",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.white
-                                ),  
-                              ),
-                            ),
-                          )
-                        ),
-                      ],
-                      indicatorColor: Colors.transparent,
+                          ),
+                        ],
+                        indicatorColor: Colors.transparent,
+                      ),
                     ),
-                  ),
-
-                  
-                ],
+                
+                    
+                  ],
+                ),
               ),
             ),
           ),
-
+    
           
           Container(
             padding: const EdgeInsets.only(
@@ -535,7 +546,7 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                                       ),
                                     );
                                   },
-
+    
                                   child: Container(
                                     color: Colors.transparent,
                                     padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
@@ -612,11 +623,11 @@ class _MessagesThreads extends State<MessagesThreads> with SingleTickerProviderS
                                             ),
                                           ],
                                         ),
-
+    
                                         if (index == (filteredDocuments!.length - 1)) const SizedBox(
                                           height: 10,
                                         ),
-
+    
                                         if (index == (filteredDocuments!.length - 1)) Divider(
                                           color: primaryColor,
                                           thickness: 2,
