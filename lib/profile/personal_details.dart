@@ -1,7 +1,13 @@
 import 'package:porao_app/common/all_import.dart';
 
 class PersonalDetails extends StatefulWidget {
-  const PersonalDetails({super.key});
+
+  final String profileID;
+
+  const PersonalDetails({
+    Key? key,
+    required this.profileID,
+  }) : super(key: key);
 
   @override
   State<PersonalDetails> createState() => _PersonalDetailsState();
@@ -9,9 +15,8 @@ class PersonalDetails extends StatefulWidget {
 
 class _PersonalDetailsState extends State<PersonalDetails> {
   String name = "";
-  String designation = "";
-  String institution = "";
-  String location = "";
+  String location = "Not-Provided";
+  String qualification = "";
   double rating = 0.0;
   int conversation = 0;
   String dpurl = "";
@@ -26,19 +31,17 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   Future<void> fetchData() async {
     final userRef = FirebaseFirestore.instance
         .collection('users')
-        .doc('rNc4Xg5B4CbjBaJzCzUoySNAqxF2');
+        .doc(widget.profileID);
     final docSnapshot = await userRef.get();
     if (docSnapshot.exists) {
       final userData = docSnapshot.data();
+      final qualif = userData?['qualifications'];
+      final userQualification = qualif.last;
       setState(() {
         name = userData?['name'];
-        designation = userData?['designation'];
-        institution = userData?['institution-name'];
-        location = userData?['location'];
-        rating = userData?['rating']?.toDouble();
-        conversation = userData?['conversations']?.toInt();
+        qualification = userQualification;
         dpurl = userData?['dp-url'];
-        coverurl = userData?['cover-url'];
+        coverurl = userData?['dp-url'];
       });
     }
   }
@@ -46,7 +49,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Personal Details'),
+      appBar: CustomAppBar(title: widget.profileID),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,11 +57,11 @@ class _PersonalDetailsState extends State<PersonalDetails> {
           Stack(
             children: [
               // --------------------------------------------------------Cover
-              const Image(
+              Image(
                 height: 130,
                 width: double.infinity,
                 fit: BoxFit.cover,
-                image: AssetImage('assets/images/rudro.jpg'),
+                image: NetworkImage(coverurl),
               ),
               // -----------------------------------------------Display Picture Section
               Container(
@@ -170,7 +173,7 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                         fontSize: 25,
                       ),
                     ),
-                    GestureDetector(
+                    GestureDetector(            //.....................MESSAGE BUTTON
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         margin: const EdgeInsets.only(right: 20),
@@ -188,7 +191,9 @@ class _PersonalDetailsState extends State<PersonalDetails> {
                           ],
                         ),
                       ),
-                      onTap: () {},
+                      onTap: () {
+                        messageBuilder();
+                      },
                     )
                   ],
                 ),
@@ -289,30 +294,87 @@ class _PersonalDetailsState extends State<PersonalDetails> {
     );
   }
 
-  // void messageCreater(BuildContext context, String profileUserId) async {
+  Future<void> messageBuilder() async {
+    final String curUserId = "87zvzezdC4dNSVFpDkKNhjqlB6u2";//FirebaseAuth.instance.currentUser!.uid;
 
-  //   final String curUserId = FirebaseAuth.instance.currentUser!.uid;
+    final List<String> userIds = [curUserId, widget.profileID];
 
-  //   final List<String> userIds = [curUserId, profileUserId];
+    final existingMessages = FirebaseFirestore.instance
+        .collection('messages')
+        .where('user1id', whereIn: userIds)
+        .where('user2id', whereIn: userIds);
 
-  //   final Stream<QuerySnapshot> existingMessages = FirebaseFirestore.instance
-  //       .collection('messages')
-  //       .where('user1id', whereIn: userIds)
-  //       .where('user2id', whereIn: userIds)
-  //       .snapshots();
+    final snapshot = await existingMessages.get();
+    final documents = snapshot.docs.map((doc) {
+      final documentData = doc.data();
+      final documentId = doc.id;
+      documentData['id'] = documentId;
+      return documentData;
+    }).toList();
 
-  //   await for (final snapshot in existingMessages) {
-  //     if (snapshot.docs.isNotEmpty) {
-  //       final messageData = snapshot.docs.first.data();
-  //       return;
-  //     }
-  //   }
 
-  //   final docRef = FirebaseFirestore.instance.collection('messages').doc();
-  //   await docRef.set({
-  //     'user1id': curUserId,
-  //     'user2id': profileUserId,
-  //   });
+    if (documents.isNotEmpty){
+      final Map<String, dynamic> doc = documents[0];
+      String docID = "";
+      String userName = "";
+      String userDP = "";
+      String userId = "";
 
-  // }
+      if (doc['user1_id'] == curUserId) {
+        docID = doc['id'];
+        userName = doc['user2_name'];
+        userDP = doc['user2DpUrl'];
+        userId = doc['user2_id'];
+      } else if (doc['user2_id'] == curUserId) {
+        docID = doc['id'];
+        userName = doc['user1_name'];
+        userDP = doc['user1DpUrl'];
+        userId = doc['user1_id'];
+      } 
+        
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              docID: docID,
+              userName: userName,
+              userDP: userDP,
+              userId: userId,
+              currentUserId: curUserId,
+            ),
+          ),
+        );
+    }
+    // Push to ChatPage with retrieved data
+    
+
+    // No existing message found, create a new document
+    if (widget.profileID != curUserId) {
+      final sender = FirebaseFirestore.instance.collection('user').doc(curUserId).get();
+      final senderData = (await sender).data();
+      
+      final senderName = senderData!['name']; // Use null-assertion after await
+      final senderDP = senderData['DP'];
+      
+      final receiver = FirebaseFirestore.instance.collection('user').doc(widget.profileID).get();
+      final receiverData = (await receiver).data();
+      
+      final receiverName = receiverData!['name'];
+      final receiverDP = receiverData['DP'];
+      
+      final docRef = FirebaseFirestore.instance.collection('messages').doc();
+      await docRef.set({
+        'user1_id': curUserId,
+        'user2_id': widget.profileID,
+        'user1_name': senderName,
+        'user2_name': receiverName,
+        'user1DpUrl': senderDP,
+        'user2DpUrl': receiverDP,
+        'last_msg': "",
+        'last_time': Timestamp.now(),
+        'msg_num': 0,
+      });
+    }
+  }
+
 }

@@ -187,7 +187,7 @@ class Signaling {
     RTCVideoRenderer remoteVideo,
   ) async {
     var stream = await navigator.mediaDevices
-        .getUserMedia({'video': true, 'audio': true});
+        .getUserMedia({'video': true, 'audio': false});
 
     localVideo.srcObject = stream;
     localStream = stream;
@@ -217,6 +217,10 @@ class Signaling {
 
       await roomRef.delete();
     }
+
+    await FirebaseFirestore.instance
+      .collection('rooms')
+      .doc(roomId).delete();
 
     localStream!.dispose();
     remoteStream?.dispose();

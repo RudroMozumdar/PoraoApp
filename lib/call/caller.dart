@@ -2,10 +2,31 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:porao_app/common/all_import.dart';
 import 'package:porao_app/call/signaling.dart';
 
 class CallerWidget extends StatefulWidget {
-  const CallerWidget({Key? key}) : super(key: key);
+
+  final String callerName;
+  final String callerDP;
+  final String calleeName;
+  final String calleeDP;
+  final String callerID;
+  final String chatDocID;
+  final String createOrJoin;
+  final String roomID;
+
+  const CallerWidget({
+    Key? key,
+    required this.callerName,
+    required this.callerDP,
+    required this.calleeName,
+    required this.calleeDP,
+    required this.callerID,
+    required this.chatDocID,
+    required this.createOrJoin,
+    required this.roomID,
+  }) : super(key: key);
 
   @override
   _CallerWidget createState() => _CallerWidget();
@@ -29,7 +50,29 @@ class _CallerWidget extends State<CallerWidget> {
       setState(() {});
     });
 
+    //signaling.openUserMedia(_localRenderer, _remoteRenderer);
+
+    if(widget.createOrJoin == "Create"){
+      createRoomWithAsync();
+    } else if (widget.createOrJoin == "Join"){
+      joinRoomwithoutAsync();
+    }
+    
     super.initState();
+  }
+
+  Future<void> createRoomWithAsync () async {
+    roomId = await signaling.createRoom(_remoteRenderer);
+    textEditingController.text = roomId!;
+    sendRoomID();
+    setState(() {});
+  }
+
+  void joinRoomwithoutAsync() {
+    signaling.joinRoom(
+      widget.roomID,
+      _remoteRenderer,
+    );
   }
 
   @override
@@ -43,7 +86,7 @@ class _CallerWidget extends State<CallerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Welcome to Flutter Explained - WebRTC"),
+        title: Text(widget.roomID),
       ),
       body: Column(
         children: [
@@ -123,5 +166,37 @@ class _CallerWidget extends State<CallerWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> sendRoomID() async {
+
+    final roomRef = FirebaseFirestore.instance
+      .collection('messages')
+      .doc(widget.chatDocID)
+      .collection('messagelist');
+
+    var firstName = widget.callerName.split(" ").first;
+
+    try {
+      await roomRef.add({
+        "addTime": Timestamp.now(),
+        "content": "$firstName invited you to a Room. \nRoom ID: $roomId",
+        "senderID": widget.callerID,
+        "type": "text",
+      });
+
+      await FirebaseFirestore
+        .instance
+        .collection('messages')
+        .doc(widget.chatDocID)
+        .update({
+          'last_msg': "$firstName invited you to a Room. \nRoom ID: $roomId",
+          'last_time': Timestamp.now(),
+          'msg_num': FieldValue.increment(1),
+        });
+    } catch (error) {
+      print('Error sending message: $error');
+    }
+
   }
 }

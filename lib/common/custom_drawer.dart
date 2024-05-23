@@ -77,8 +77,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
       children: [
         menuItem(1, "View Public Profile", Icons.person, true,
             MaterialPageRoute(builder: (BuildContext context) {
-          return PublicProfile(
-            uid: Auth().currentUser!.uid,
+          return Profile(
+            
           );
         })),
         menuItem(2, "Settings", Icons.settings, false,

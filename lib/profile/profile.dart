@@ -60,7 +60,9 @@ class _ProfileState extends State<Profile> {
                 ),
                 const Divider(endIndent: 30, indent: 30),
                 options(
-                    "Personal Details", Icons.person, const PersonalDetails()),
+                    "Personal Details", Icons.person, PersonalDetails(
+                      profileID: FirebaseAuth.instance.currentUser!.uid,
+                    )),
                 options("Settings", Icons.settings, const AppSettings()),
                 options("Feedack", Icons.format_quote, const FeedBack()),
                 options("FAQ", Icons.feedback, const Faq()),

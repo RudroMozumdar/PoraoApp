@@ -16,6 +16,7 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _controllerUserame = TextEditingController();
   final TextEditingController _controllerDOB = TextEditingController();
   late DateTime dateOfBirth;
+  final TextEditingController _controllerDesignation = TextEditingController();
   final TextEditingController _controllerInstitution = TextEditingController();
   final TextEditingController _controllerNID = TextEditingController();
 
@@ -57,6 +58,7 @@ class _SignUpState extends State<SignUp> {
       'name': _controllerUserame.text,
       'date-of-birth': dateOfBirth,
       'institution-name': _controllerInstitution.text,
+      'qualifications': [_controllerDesignation.text + " at " + _controllerInstitution.text],
       'nid': _controllerNID.text,
     });
   }
@@ -115,6 +117,16 @@ class _SignUpState extends State<SignUp> {
       borderRadius: 40,
       controller: _controllerDOB,
       readOnly: true,
+    );
+  }
+
+  //Designation Field -------------------------------------------------------------
+  Widget _designationField() {
+    return CustomTextField(
+      hintText: "Designation",
+      prefixIcon: const Icon(Icons.work),
+      borderRadius: 40,
+      controller: _controllerDesignation,
     );
   }
 
@@ -211,6 +223,8 @@ class _SignUpState extends State<SignUp> {
                 _dobField(),
                 const SizedBox(height: 15),
                 _institutionField(),
+                const SizedBox(height: 15),
+                _designationField(),
                 const SizedBox(height: 15),
                 _nidField(),
                 const SizedBox(height: 15),

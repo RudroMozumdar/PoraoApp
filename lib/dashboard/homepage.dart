@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               Text(
                 "Have something on your mind?",
                 style: TextStyle(
-                  fontSize: 21,
+                  fontSize: 18,
                   fontFamily: primaryFont,
                   fontWeight: FontWeight.w500
                 ),
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     "Welcome",
                     style: TextStyle(
                       fontFamily: primaryFont,
-                      fontSize: 18,
+                      fontSize: 16,
                     ),
                   ),
                   SizedBox(
@@ -181,7 +181,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       style: TextStyle(
                         fontFamily: primaryFont,
                         fontWeight: FontWeight.bold,
-                        fontSize: 26,
+                        fontSize: 24,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       "$age, $userQualification",
                       style: TextStyle(
                         fontFamily: primaryFont,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -264,7 +264,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           "Your Daily Question Feed",
                           style: TextStyle(
                             fontFamily: primaryFont,
-                            fontSize: 21,
+                            fontSize: 18,
                             fontWeight: FontWeight.w500
                           ),
                         ),

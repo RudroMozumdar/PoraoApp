@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:porao_app/call/tempCall.dart';
@@ -26,16 +29,22 @@ class ChatPage extends StatefulWidget {
 class _ChatPage extends State<ChatPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool showWhiteboard = false;
+  bool isJoinButtonActive = true;
+  bool messageControllerIsEmpty = true;
   Timer? _timer;
-  File? _selectedImage;
+  String selectedImageName = Timestamp.now().toString();
+  var imagePath;
 
   @override
   void dispose() {
     _timer?.cancel();
+    _messageController.dispose();
+    _joinRoomController.dispose();
+    _messageController.removeListener(() { 
+      messageControllerIsEmpty = _messageController.text.isEmpty;
+    });
     super.dispose();
   }
-
-  //final AgoraClient
 
   Future<List<Map<String, dynamic>>> fetchMessageList() async {
     final collectionRef = _firestore
@@ -51,6 +60,23 @@ class _ChatPage extends State<ChatPage> {
 
     return documents;
   }
+
+  Future<String> fetchCurrentUserInfo(String fieldName) async {
+    String desiredField = "PlaceHolder";
+
+    final userInfoRef = _firestore.collection("users").doc(widget.currentUserId);
+    final docSnapshot = await userInfoRef.get(); // Await document snapshot
+
+    if (docSnapshot.exists) {
+      final data = docSnapshot.data() as Map<String, dynamic>;
+      desiredField = data[fieldName];
+    } else {
+      print("Document not found"); // Handle document not found scenario
+    }
+
+    return desiredField;
+  }
+
 
   String _formatTimestampForDisplay(dynamic timestampValue) {
     Timestamp firebaseTimestamp = timestampValue as Timestamp;
@@ -87,6 +113,15 @@ class _ChatPage extends State<ChatPage> {
 
   //text controller
   final TextEditingController _messageController = TextEditingController();
+  final TextEditingController _joinRoomController = TextEditingController();
+
+  @override
+  void initState() {
+    _messageController.addListener(() {
+      messageControllerIsEmpty = _messageController.text.isEmpty;
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +140,7 @@ class _ChatPage extends State<ChatPage> {
                   backgroundImage: NetworkImage(widget.userDP), //Reciever DP
                 ),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.45,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   child: Text(
                     "  ${widget.userName}", // Reciever NAME
                     style: const TextStyle(
@@ -114,35 +149,37 @@ class _ChatPage extends State<ChatPage> {
                 ),
               ],
             ),
-            IconButton(
-              //.............CALL Button
-              onPressed: () {
+            ElevatedButton(
+              onPressed: () async {
+                String curUserName = await fetchCurrentUserInfo("name");
+                String curUserDP = await fetchCurrentUserInfo("dp-url");
+                String roomID = _joinRoomController.text;
                 Navigator.push(
                   context,
-                  // MaterialPageRoute(
-                  //   builder: (context) => CallScreen(
-                  //     name: widget.userName,
-                  //     DP: widget.userDP,
-                  //   ),
-                  // ),
                   MaterialPageRoute(
-                    builder: ((context) => const CallerWidget())
+                    builder: ((context) => MyHomePage(
+                      callerName: curUserName,
+                      callerDP: curUserDP,
+                      calleeName: widget.userName,
+                      calleeDP: widget.userDP,
+                      callerID: widget.currentUserId,
+                      chatDocID: widget.docID,
+                      createOrJoin: "Join",
+                      roomID: roomID,
+                    ))
                   )
-                );                
+                ); 
               },
-              icon: const Icon(
-                Icons.call,
-                size: 30,
+
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(Icons.video_camera_back),
+              
+                  Text("Rooms", style: TextStyle(fontSize: 16),)
+                ],
               ),
-              style: ButtonStyle(
-                backgroundColor:
-                    MaterialStatePropertyAll<Color>(primaryButtonColor),
-                shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(45.0),
-                )),
-              ),
-            ),
+            )
           ],
         ),
         backgroundColor: primaryColor,
@@ -233,13 +270,15 @@ class _ChatPage extends State<ChatPage> {
               color: messageColor,
               borderRadius: BorderRadius.circular(10.0),
             ),
-            child: Text(
+            child: message['type'] == "text" 
+            ? SelectableText(
               message['content'] ?? ' ',
               textAlign: textAlign,
               style: const TextStyle(
                 color: Colors.white,
               ),
-            ),
+            )
+            : Image.network(message['content']),
           ),
 
           if (!isSender)
@@ -266,22 +305,47 @@ class _ChatPage extends State<ChatPage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
 
-          IconButton(       //.............Keyboard ATTACHMENT Button
-            onPressed: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const WhiteboardWidget(),
+          Visibility(
+            visible: messageControllerIsEmpty,
+            child: IconButton(       //.............WHITEBOARD Button
+              onPressed: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WhiteboardWidget(),
+                  ),
+                );
+              }, 
+              icon: const Icon(Icons.draw, size: 30,),
+              style: ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(45.0),
+                  )
                 ),
-              );
-            }, 
-            icon: const Icon(Icons.attach_file_outlined, size: 30,),
-            style: ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
-              shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(45.0),
-                )
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            width: 10,
+          ),
+
+          Visibility(
+            visible: messageControllerIsEmpty,
+            child: IconButton(       //.............GALLERY Button
+              onPressed: (){
+                _pickImageFromGallery();
+              }, 
+              icon: const Icon(Icons.image, size: 30,),
+              style: ButtonStyle(
+                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(45.0),
+                  )
+                ),
               ),
             ),
           ),
@@ -320,76 +384,282 @@ class _ChatPage extends State<ChatPage> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 5),
-                          child: IconButton(
-                            onPressed: () async {
-                              final messageContent = _messageController.text;
-
-                              final messageId =
-                                  _firestore.collection('messagelist').doc().id;
-
-                              try {
-                                await _firestore
-                                    .collection('messages')
-                                    .doc(widget
-                                        .docID) // Use the existing chat document ID
-                                    .collection('messagelist')
-                                    .doc(messageId)
-                                    .set({
-                                  'content': messageContent,
-                                  'addTime': Timestamp.now(), // Add a timestamp for message order
-                                  'senderID': widget.currentUserId,
-                                  'type': "text"
-                                });
-
-                                _messageController.clear();
-
+                          child: Visibility(
+                            visible: !messageControllerIsEmpty,
+                            child: IconButton(
+                              onPressed: () async {
+                                final messageContent = _messageController.text;
+                            
+                                final messageId =
+                                    _firestore.collection('messagelist').doc().id;
+                            
                                 try {
                                   await _firestore
                                       .collection('messages')
-                                      .doc(widget.docID)
-                                      .update({
-                                    'last_msg': messageContent,
-                                    'last_time': Timestamp.now(), // Add a timestamp for message order
-                                    'msg_num': FieldValue.increment(1),
+                                      .doc(widget
+                                          .docID) // Use the existing chat document ID
+                                      .collection('messagelist')
+                                      .doc(messageId)
+                                      .set({
+                                    'content': messageContent,
+                                    'addTime': Timestamp.now(), // Add a timestamp for message order
+                                    'senderID': widget.currentUserId,
+                                    'type': "text"
                                   });
+                            
+                                  _messageController.clear();
+                            
+                                  try {
+                                    await _firestore
+                                        .collection('messages')
+                                        .doc(widget.docID)
+                                        .update({
+                                      'last_msg': messageContent,
+                                      'last_time': Timestamp.now(), // Add a timestamp for message order
+                                      'msg_num': FieldValue.increment(1),
+                                    });
+                                  } catch (error) {
+                                    print('Error sending message: $error');
+                                  }
+                            
+                                  setState(
+                                      () {}); // Refresh the UI to reflect the new message
                                 } catch (error) {
+                                  // Handle any errors that occur during Firestore operations
                                   print('Error sending message: $error');
                                 }
-
-                                setState(
-                                    () {}); // Refresh the UI to reflect the new message
-                              } catch (error) {
-                                // Handle any errors that occur during Firestore operations
-                                print('Error sending message: $error');
-                              }
-                            },
-                            icon: const Icon(Icons.send),
+                              },
+                              icon: const Icon(Icons.send),
+                            ),
                           ),
-                        )
-                      ])))
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
         ],
       ),
     );
   }
 
   Future _pickImageFromGallery() async {
-    final status = await Permission.storage.request();
+    final File _selectedImage;
+    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if (status == PermissionStatus.granted) {
-      // Permission granted, proceed with picking the image
-      final returnedImage =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (returnedImage != null) {
-        setState(() {
-          _selectedImage = File(returnedImage.path);
+    if(returnedImage == null) return;
+    _selectedImage = File(returnedImage.path);
+    setState(() {
+      selectedImageName = Timestamp.now().toString();
+      imagePath = returnedImage.path;
+    });
+
+    
+    _showImageAlertDialog(context, _selectedImage);
+
+  }
+
+  void _showImageAlertDialog(BuildContext context, File _selectedImage) { 
+    String curuserID = widget.currentUserId;
+    String curTime = DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
+    showDialog( 
+      context: context, 
+      builder: (BuildContext context) { 
+        return AlertDialog( 
+          backgroundColor: Colors.white,
+          title: Text('Selected Image: $curTime$curuserID.jpg'), 
+          content: Column( 
+            mainAxisSize: MainAxisSize.min, 
+            children: <Widget>[ 
+              _selectedImage != null 
+              ? SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                height: MediaQuery.of(context).size.height * 0.6,
+                child: Image.file(_selectedImage!)
+              ) 
+              : const Text("Please select an image"),
+              SizedBox(height: 16),
+            ], 
+          ), 
+          actions: <Widget>[ 
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(    ////////////////................UPLOAD IMAGE
+                    onPressed: () async { 
+                      await uploadImage(_selectedImage);
+                      Navigator.pop(context);
+                    }, 
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll<Color>(primaryColor),
+                    ),
+                    child: const Icon(Icons.arrow_upward, color: Colors.white,), 
+                  ),
+
+                  ElevatedButton(   ////////////////................CLOSE ALERT
+                    onPressed: () { 
+                      print("selected");
+                      Navigator.of(context).pop();
+                    }, 
+                    style: const ButtonStyle(
+                      backgroundColor: MaterialStatePropertyAll<Color>(Colors.red),
+                    ),
+                    child: const Icon(Icons.cancel, color: Colors.white), 
+                  ),
+                ],
+              )
+            ), 
+          ], 
+        ); 
+      }, 
+    ); 
+  } 
+
+  Future<void> uploadImage(File selectedImage) async {
+
+    String curuserID = widget.currentUserId;
+    String curTime = DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
+    String imageName = "$curTime$curuserID.jpg";
+
+    final path = 'userUploads/$imageName';
+
+    final storageRef = FirebaseStorage.instance.ref().child(path);
+    await storageRef.putFile(selectedImage);
+
+    String imageLink = "tempoLink";
+    imageLink = await storageRef.getDownloadURL();
+
+    updateImageinMessages(imageLink);
+
+  }
+
+  Future<void> updateImageinMessages (String imageLink) async {
+    final roomRef = FirebaseFirestore.instance
+      .collection('messages')
+      .doc(widget.docID)
+      .collection('messagelist');
+
+
+    try {
+      await roomRef.add({
+        "addTime": Timestamp.now(),
+        "content": imageLink,
+        "senderID": widget.currentUserId,
+        "type": "Hyperlink",
+      });
+
+      await FirebaseFirestore
+        .instance
+        .collection('messages')
+        .doc(widget.docID)
+        .update({
+          'last_msg': imageLink,
+          'last_time': Timestamp.now(),
+          'msg_num': FieldValue.increment(1),
         });
-      }
-    } else if (status == PermissionStatus.permanentlyDenied) {
-      // Permission permanently denied, handle it
-      openAppSettings(); // Open app settings to allow permissions
-    } else {
-      print('Didnt work');
+    } catch (error) {
+      print('Error sending message: $error');
     }
   }
+
 }
 
+
+
+// showDialog(
+//   context: context, 
+//   builder: (context) => Center(
+//   child: AlertDialog(
+//   actions: [
+//   TextField(
+//   decoration: InputDecoration(
+//       hintText: 'Type Message here',
+//       filled: true,
+//       fillColor: primaryButtonColor,
+//       border: InputBorder.none,
+//       focusedBorder: OutlineInputBorder(
+//         borderRadius: BorderRadius.circular(45),
+//         borderSide: BorderSide.none,
+//       ),
+//     ),
+//     controller: _joinRoomController,
+//     autofocus: true,
+//     onSubmitted: (text) {
+//       print("Reply: $text");
+//     },
+//   ),
+
+//   ElevatedButton(                         //................Join Room Button
+//   onPressed: () async {
+//     String curUserName = await fetchCurrentUserInfo("name");
+//     String curUserDP = await fetchCurrentUserInfo("dp-url");
+//     String roomID = _joinRoomController.text;
+    
+//     _joinRoomController.clear();   
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: ((context) => CallerWidget(
+//           callerName: curUserName,
+//           callerDP: curUserDP,
+//           calleeName: widget.userName,
+//           calleeDP: widget.userDP,
+//           callerID: widget.currentUserId,
+//           chatDocID: widget.docID,
+//           createOrJoin: "Join",
+//           roomID: roomID,
+//         ))
+//       )
+//     ); 
+//   },
+//   child: Text("Join Room")
+//   ),
+
+//   ElevatedButton(                         //................Create Room Button
+//   onPressed: () async {
+//     String curUserName = await fetchCurrentUserInfo("name");
+//     String curUserDP = await fetchCurrentUserInfo("dp-url");
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//         builder: ((context) => CallerWidget(
+//           callerName: curUserName,
+//           callerDP: curUserDP,
+//           calleeName: widget.userName,
+//           calleeDP: widget.userDP,
+//           callerID: widget.currentUserId,
+//           chatDocID: widget.docID,
+//           createOrJoin: "Create",
+//           roomID: "",
+//         ))
+//       )
+//     );    
+//   }, 
+//   child: Text("Create Room")
+//   ),
+
+//   ElevatedButton(
+//   onPressed: () {
+//     Navigator.push(
+//       context, 
+//       MaterialPageRoute(
+//         builder: ((context) => MyHomePage()))
+//     );
+//   }, 
+//   child: Text("Old Join"),
+//   ),
+
+//   ElevatedButton(
+//   onPressed: () {
+//     Navigator.push(
+//       context, 
+//       MaterialPageRoute(
+//         builder: ((context) => MyHomePage()))
+//     );
+//   }, 
+//   child: Text("Old Create"),
+//   )
+//   ],
+//   ),
+//   )
+//   );

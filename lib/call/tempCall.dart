@@ -1,93 +1,222 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:porao_app/common/all_import.dart';
+import 'package:porao_app/call/tempSignaling.dart';
 
-class CallScreen extends StatelessWidget {
-  final String name;
-  final String DP;
+class MyHomePage extends StatefulWidget {
 
-  const CallScreen({
+  final String callerName;
+  final String callerDP;
+  final String calleeName;
+  final String calleeDP;
+  final String callerID;
+  final String chatDocID;
+  final String createOrJoin;
+  final String roomID;
+
+  const MyHomePage({
     Key? key,
-    required this.name,
-    required this.DP,
+    required this.callerName,
+    required this.callerDP,
+    required this.calleeName,
+    required this.calleeDP,
+    required this.callerID,
+    required this.chatDocID,
+    required this.createOrJoin,
+    required this.roomID,
   }) : super(key: key);
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  Signaling signaling = Signaling();
+  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
+  String? roomId;
+  TextEditingController textEditingController = TextEditingController(text: '');
+
+  bool cameraMicOn = false;
+  bool roomCreatedVisible = true;
+  bool roomJoinedVisible = true;
+
+  @override
+  void initState() {
+    _localRenderer.initialize();
+    _remoteRenderer.initialize();
+
+    signaling.onAddRemoteStream = ((stream) {
+      _remoteRenderer.srcObject = stream;
+      setState(() {});
+    });
+
+    // signaling.openUserMedia(_localRenderer, _remoteRenderer);
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _localRenderer.dispose();
+    _remoteRenderer.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Center(child: Text("Calling \n" + name, textAlign: TextAlign.center,)),
+        title: Text("Room"),
       ),
-      body: Stack(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 100.0,
-              height: 100.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey[200], // Set background color for the circle
-              ),
-              child: ClipOval( // Clip content to fit within the circle
-                child: Image.network(
-                  // Replace with your image URL
-                  DP,
-                  fit: BoxFit.cover, // Adjust image fitting if needed
-                ),
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(child: RTCVideoView(_localRenderer, mirror: true)),
+                  Expanded(child: RTCVideoView(_remoteRenderer)),
+                ],
               ),
             ),
           ),
-
-          AlertDialog(
-            backgroundColor: Color.fromARGB(206, 146, 190, 226),
-            title: Center(child: Text('[ERROR] CALL FAILED (x1298j08_no_balance)\nYour Current Minutes Balance: 0 mins.')),
-            actions: [
-              IconButton(onPressed: () {
-                Navigator.pop(context);
-              }, 
-              icon: Center(child: Text("Go Back")))
-            ],
-          ),
-          // Positioned row for buttons at bottom center
-          Positioned(
-            bottom: 20.0,
-            left: 0,
-            right: 0,
+          
+          
+          Visibility(
+            visible: roomJoinedVisible,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Icon(Icons.video_camera_back),
-                ),
-                SizedBox(width: 20.0),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      label: Text("Enter Room ID")
+                    ),
+                    controller: textEditingController,
                   ),
-                  child: Icon(Icons.add_ic_call, color: Colors.green),
                 ),
-                SizedBox(width: 20.0),
+            
                 ElevatedButton(
-                  onPressed: () {}, // Replace with actual joining logic
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-                  ),
-                  child: Icon(Icons.call, color: Colors.white),
-                ),
-                SizedBox(width: 20.0),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-                  ),
-                  child: Icon(Icons.call, color: Colors.white),
-                ),
+                  onPressed: () {
+                    signaling.joinRoom(
+                      textEditingController.text.trim(),
+                      _remoteRenderer,
+                    );
+                    setState(() {
+                      roomJoinedVisible = !roomJoinedVisible;
+                      roomCreatedVisible = !roomCreatedVisible;
+                    });
+                  },
+                  child: Text("Join room"),
+                ),              
               ],
             ),
           ),
+
+          const SizedBox(height: 30),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: cameraMicOn  
+                    ? const MaterialStatePropertyAll<Color>(Color.fromARGB(255, 245, 233, 248))
+                    : const MaterialStatePropertyAll<Color>(Color.fromARGB(255, 237, 206, 241))
+                ),
+                onPressed: () {
+                  signaling.openUserMedia(_localRenderer, _remoteRenderer);
+                  setState(() {
+                    cameraMicOn = !cameraMicOn;
+                  });
+                },
+                //child: Text("Open camera & microphone"),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.15,
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Icon(Icons.video_call),
+
+                      Text("/"),
+
+                      Icon(Icons.mic)
+                    ],
+                  ),
+                ),
+              ),
+
+              Visibility(
+                visible: roomCreatedVisible,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    roomId = await signaling.createRoom(_remoteRenderer);
+                    sendRoomID();
+                    setState(() {
+                      roomCreatedVisible = !roomCreatedVisible;
+                      roomJoinedVisible = !roomJoinedVisible;
+                    });
+                  },
+                  child: Text("Create room"),
+                ),
+              ),
+
+              ElevatedButton(
+                onPressed: () {
+                  signaling.hangUp(_localRenderer);
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.call_end),    //........HANG UP
+              )
+            ],
+          ),
+
+          const SizedBox(height: 30),
         ],
       ),
     );
+  }
+
+  Future<void> sendRoomID() async {
+
+    final roomRef = FirebaseFirestore.instance
+      .collection('messages')
+      .doc(widget.chatDocID)
+      .collection('messagelist');
+
+    var firstName = widget.callerName.split(" ").first;
+
+    try {
+      await roomRef.add({
+        "addTime": Timestamp.now(),
+        "content": "$firstName invited you to a Room. \nRoom ID: $roomId",
+        "senderID": widget.callerID,
+        "type": "text",
+      });
+
+      await FirebaseFirestore
+        .instance
+        .collection('messages')
+        .doc(widget.chatDocID)
+        .update({
+          'last_msg': "$firstName invited you to a Room. \nRoom ID: $roomId",
+          'last_time': Timestamp.now(),
+          'msg_num': FieldValue.increment(1),
+        });
+    } catch (error) {
+      print('Error sending message: $error');
+    }
+
   }
 }
