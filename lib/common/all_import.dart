@@ -15,6 +15,8 @@ export 'package:permission_handler/permission_handler.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart' hide AsyncError;
 export 'package:image_picker/image_picker.dart';
 export 'package:flutter_rating_bar/flutter_rating_bar.dart';
+export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+export 'package:flutter_localizations/flutter_localizations.dart';
 export 'dart:async' hide AsyncError;
 
 // Pages Import
