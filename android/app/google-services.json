@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:126183682637:android:5b2a03d13bde9821bae204",
         "android_client_info": {
-          "package_name": "com.example.porao_app"
+          "package_name": "com.rudro.porao_app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "126183682637-alkil2hgjljju99jskqripqnv8edmtmg.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.porao_app",
+            "package_name": "com.rudro.porao_app",
             "certificate_hash": "6e3eb39063d6d6a70c20298e5c43b7050b47dcd4"
           }
         },

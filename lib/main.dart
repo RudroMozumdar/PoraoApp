@@ -1,5 +1,3 @@
-import 'dart:js_interop_unsafe';
-
 import 'package:porao_app/common/all_import.dart';
 
 Future<void> main() async {
@@ -17,16 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'PORAO',
       theme: lightTheme,
       // darkTheme: darkTheme,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('bn')
-      ],
+      supportedLocales: const [Locale('en'), Locale('bn')],
       home: const MyHomePage(title: 'Porate Chai Home Page'),
       debugShowCheckedModeBanner: false,
     );

@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:intl/intl.dart';
-import 'dart:io';
 import 'package:porao_app/call/tempCall.dart';
 import 'package:porao_app/common/all_import.dart';
 
@@ -40,7 +36,7 @@ class _ChatPage extends State<ChatPage> {
     _timer?.cancel();
     _messageController.dispose();
     _joinRoomController.dispose();
-    _messageController.removeListener(() { 
+    _messageController.removeListener(() {
       messageControllerIsEmpty = _messageController.text.isEmpty;
     });
     super.dispose();
@@ -64,7 +60,8 @@ class _ChatPage extends State<ChatPage> {
   Future<String> fetchCurrentUserInfo(String fieldName) async {
     String desiredField = "PlaceHolder";
 
-    final userInfoRef = _firestore.collection("users").doc(widget.currentUserId);
+    final userInfoRef =
+        _firestore.collection("users").doc(widget.currentUserId);
     final docSnapshot = await userInfoRef.get(); // Await document snapshot
 
     if (docSnapshot.exists) {
@@ -76,7 +73,6 @@ class _ChatPage extends State<ChatPage> {
 
     return desiredField;
   }
-
 
   String _formatTimestampForDisplay(dynamic timestampValue) {
     Timestamp firebaseTimestamp = timestampValue as Timestamp;
@@ -155,28 +151,27 @@ class _ChatPage extends State<ChatPage> {
                 String curUserDP = await fetchCurrentUserInfo("dp-url");
                 String roomID = _joinRoomController.text;
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => MyHomePage(
-                      callerName: curUserName,
-                      callerDP: curUserDP,
-                      calleeName: widget.userName,
-                      calleeDP: widget.userDP,
-                      callerID: widget.currentUserId,
-                      chatDocID: widget.docID,
-                      createOrJoin: "Join",
-                      roomID: roomID,
-                    ))
-                  )
-                ); 
+                    context,
+                    MaterialPageRoute(
+                        builder: ((context) => MyHomePage(
+                              callerName: curUserName,
+                              callerDP: curUserDP,
+                              calleeName: widget.userName,
+                              calleeDP: widget.userDP,
+                              callerID: widget.currentUserId,
+                              chatDocID: widget.docID,
+                              createOrJoin: "Join",
+                              roomID: roomID,
+                            ))));
               },
-
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Icon(Icons.video_camera_back),
-              
-                  Text("Rooms", style: TextStyle(fontSize: 16),)
+                  Text(
+                    "Rooms",
+                    style: TextStyle(fontSize: 16),
+                  )
                 ],
               ),
             )
@@ -270,15 +265,15 @@ class _ChatPage extends State<ChatPage> {
               color: messageColor,
               borderRadius: BorderRadius.circular(10.0),
             ),
-            child: message['type'] == "text" 
-            ? SelectableText(
-              message['content'] ?? ' ',
-              textAlign: textAlign,
-              style: const TextStyle(
-                color: Colors.white,
-              ),
-            )
-            : Image.network(message['content']),
+            child: message['type'] == "text"
+                ? SelectableText(
+                    message['content'] ?? ' ',
+                    textAlign: textAlign,
+                    style: const TextStyle(
+                      color: Colors.white,
+                    ),
+                  )
+                : Image.network(message['content']),
           ),
 
           if (!isSender)
@@ -304,221 +299,230 @@ class _ChatPage extends State<ChatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-
           Visibility(
             visible: messageControllerIsEmpty,
-            child: IconButton(       //.............WHITEBOARD Button
-              onPressed: (){
+            child: IconButton(
+              //.............WHITEBOARD Button
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const WhiteboardWidget(),
                   ),
                 );
-              }, 
-              icon: const Icon(Icons.draw, size: 30,),
+              },
+              icon: const Icon(
+                Icons.draw,
+                size: 30,
+              ),
               style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                backgroundColor:
+                    MaterialStatePropertyAll<Color>(primaryButtonColor),
                 shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(45.0),
-                  )
-                ),
+                    RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(45.0),
+                )),
               ),
             ),
           ),
-
           const SizedBox(
             width: 10,
           ),
-
           Visibility(
             visible: messageControllerIsEmpty,
-            child: IconButton(       //.............GALLERY Button
-              onPressed: (){
+            child: IconButton(
+              //.............GALLERY Button
+              onPressed: () {
                 _pickImageFromGallery();
-              }, 
-              icon: const Icon(Icons.image, size: 30,),
+              },
+              icon: const Icon(
+                Icons.image,
+                size: 30,
+              ),
               style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(primaryButtonColor),
+                backgroundColor:
+                    MaterialStatePropertyAll<Color>(primaryButtonColor),
                 shape: MaterialStatePropertyAll<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(45.0),
-                  )
-                ),
+                    RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(45.0),
+                )),
               ),
             ),
           ),
-
           const SizedBox(
             width: 10,
           ),
-
           Expanded(
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: primaryButtonColor,
-                      borderRadius: BorderRadius.circular(45)),
-                  padding: const EdgeInsets.only(left: 15, right: 10),
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Type Message here',
-                              filled: true,
-                              fillColor: primaryButtonColor,
-                              border: InputBorder.none,
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(45),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            controller: _messageController,
-                            autofocus: true,
-                            onSubmitted: (text) {
-                              print("Reply: $text");
-                            },
-                          ),
+            child: Container(
+              decoration: BoxDecoration(
+                  color: primaryButtonColor,
+                  borderRadius: BorderRadius.circular(45)),
+              padding: const EdgeInsets.only(left: 15, right: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Type Message here',
+                        filled: true,
+                        fillColor: primaryButtonColor,
+                        border: InputBorder.none,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(45),
+                          borderSide: BorderSide.none,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 5),
-                          child: Visibility(
-                            visible: !messageControllerIsEmpty,
-                            child: IconButton(
-                              onPressed: () async {
-                                final messageContent = _messageController.text;
-                            
-                                final messageId =
-                                    _firestore.collection('messagelist').doc().id;
-                            
-                                try {
-                                  await _firestore
-                                      .collection('messages')
-                                      .doc(widget
-                                          .docID) // Use the existing chat document ID
-                                      .collection('messagelist')
-                                      .doc(messageId)
-                                      .set({
-                                    'content': messageContent,
-                                    'addTime': Timestamp.now(), // Add a timestamp for message order
-                                    'senderID': widget.currentUserId,
-                                    'type': "text"
-                                  });
-                            
-                                  _messageController.clear();
-                            
-                                  try {
-                                    await _firestore
-                                        .collection('messages')
-                                        .doc(widget.docID)
-                                        .update({
-                                      'last_msg': messageContent,
-                                      'last_time': Timestamp.now(), // Add a timestamp for message order
-                                      'msg_num': FieldValue.increment(1),
-                                    });
-                                  } catch (error) {
-                                    print('Error sending message: $error');
-                                  }
-                            
-                                  setState(
-                                      () {}); // Refresh the UI to reflect the new message
-                                } catch (error) {
-                                  // Handle any errors that occur during Firestore operations
-                                  print('Error sending message: $error');
-                                }
-                              },
-                              icon: const Icon(Icons.send),
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
+                      controller: _messageController,
+                      autofocus: true,
+                      onSubmitted: (text) {
+                        print("Reply: $text");
+                      },
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: Visibility(
+                      visible: !messageControllerIsEmpty,
+                      child: IconButton(
+                        onPressed: () async {
+                          final messageContent = _messageController.text;
+
+                          final messageId =
+                              _firestore.collection('messagelist').doc().id;
+
+                          try {
+                            await _firestore
+                                .collection('messages')
+                                .doc(widget
+                                    .docID) // Use the existing chat document ID
+                                .collection('messagelist')
+                                .doc(messageId)
+                                .set({
+                              'content': messageContent,
+                              'addTime': Timestamp
+                                  .now(), // Add a timestamp for message order
+                              'senderID': widget.currentUserId,
+                              'type': "text"
+                            });
+
+                            _messageController.clear();
+
+                            try {
+                              await _firestore
+                                  .collection('messages')
+                                  .doc(widget.docID)
+                                  .update({
+                                'last_msg': messageContent,
+                                'last_time': Timestamp
+                                    .now(), // Add a timestamp for message order
+                                'msg_num': FieldValue.increment(1),
+                              });
+                            } catch (error) {
+                              print('Error sending message: $error');
+                            }
+
+                            setState(
+                                () {}); // Refresh the UI to reflect the new message
+                          } catch (error) {
+                            // Handle any errors that occur during Firestore operations
+                            print('Error sending message: $error');
+                          }
+                        },
+                        icon: const Icon(Icons.send),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
   Future _pickImageFromGallery() async {
-    final File _selectedImage;
-    final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final File selectedImage;
+    final returnedImage =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
 
-    if(returnedImage == null) return;
-    _selectedImage = File(returnedImage.path);
+    if (returnedImage == null) return;
+    selectedImage = File(returnedImage.path);
     setState(() {
       selectedImageName = Timestamp.now().toString();
       imagePath = returnedImage.path;
     });
 
-    
-    _showImageAlertDialog(context, _selectedImage);
-
+    _showImageAlertDialog(context, selectedImage);
   }
 
-  void _showImageAlertDialog(BuildContext context, File _selectedImage) { 
+  void _showImageAlertDialog(BuildContext context, File selectedImage) {
     String curuserID = widget.currentUserId;
-    String curTime = DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
-    showDialog( 
-      context: context, 
-      builder: (BuildContext context) { 
-        return AlertDialog( 
+    String curTime =
+        DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
           backgroundColor: Colors.white,
-          title: Text('Selected Image: $curTime$curuserID.jpg'), 
-          content: Column( 
-            mainAxisSize: MainAxisSize.min, 
-            children: <Widget>[ 
-              _selectedImage != null 
-              ? SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: Image.file(_selectedImage!)
-              ) 
-              : const Text("Please select an image"),
-              SizedBox(height: 16),
-            ], 
-          ), 
-          actions: <Widget>[ 
+          title: Text('Selected Image: $curTime$curuserID.jpg'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              selectedImage != null
+                  ? SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: Image.file(selectedImage))
+                  : const Text("Please select an image"),
+              const SizedBox(height: 16),
+            ],
+          ),
+          actions: <Widget>[
             Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(    ////////////////................UPLOAD IMAGE
-                    onPressed: () async { 
-                      await uploadImage(_selectedImage);
-                      Navigator.pop(context);
-                    }, 
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll<Color>(primaryColor),
-                    ),
-                    child: const Icon(Icons.arrow_upward, color: Colors.white,), 
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  ////////////////................UPLOAD IMAGE
+                  onPressed: () async {
+                    await uploadImage(selectedImage);
+                    Navigator.pop(context);
+                  },
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll<Color>(primaryColor),
                   ),
-
-                  ElevatedButton(   ////////////////................CLOSE ALERT
-                    onPressed: () { 
-                      print("selected");
-                      Navigator.of(context).pop();
-                    }, 
-                    style: const ButtonStyle(
-                      backgroundColor: MaterialStatePropertyAll<Color>(Colors.red),
-                    ),
-                    child: const Icon(Icons.cancel, color: Colors.white), 
+                  child: const Icon(
+                    Icons.arrow_upward,
+                    color: Colors.white,
                   ),
-                ],
-              )
-            ), 
-          ], 
-        ); 
-      }, 
-    ); 
-  } 
+                ),
+                ElevatedButton(
+                  ////////////////................CLOSE ALERT
+                  onPressed: () {
+                    print("selected");
+                    Navigator.of(context).pop();
+                  },
+                  style: const ButtonStyle(
+                    backgroundColor:
+                        MaterialStatePropertyAll<Color>(Colors.red),
+                  ),
+                  child: const Icon(Icons.cancel, color: Colors.white),
+                ),
+              ],
+            )),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> uploadImage(File selectedImage) async {
-
     String curuserID = widget.currentUserId;
-    String curTime = DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
+    String curTime =
+        DateFormat('dd.MM.yy.h.mm.ss').format(DateTime.now()).toString();
     String imageName = "$curTime$curuserID.jpg";
 
     final path = 'userUploads/$imageName';
@@ -530,15 +534,13 @@ class _ChatPage extends State<ChatPage> {
     imageLink = await storageRef.getDownloadURL();
 
     updateImageinMessages(imageLink);
-
   }
 
-  Future<void> updateImageinMessages (String imageLink) async {
+  Future<void> updateImageinMessages(String imageLink) async {
     final roomRef = FirebaseFirestore.instance
-      .collection('messages')
-      .doc(widget.docID)
-      .collection('messagelist');
-
+        .collection('messages')
+        .doc(widget.docID)
+        .collection('messagelist');
 
     try {
       await roomRef.add({
@@ -548,20 +550,18 @@ class _ChatPage extends State<ChatPage> {
         "type": "Hyperlink",
       });
 
-      await FirebaseFirestore
-        .instance
-        .collection('messages')
-        .doc(widget.docID)
-        .update({
-          'last_msg': imageLink,
-          'last_time': Timestamp.now(),
-          'msg_num': FieldValue.increment(1),
-        });
+      await FirebaseFirestore.instance
+          .collection('messages')
+          .doc(widget.docID)
+          .update({
+        'last_msg': imageLink,
+        'last_time': Timestamp.now(),
+        'msg_num': FieldValue.increment(1),
+      });
     } catch (error) {
       print('Error sending message: $error');
     }
   }
-
 }
 
 
